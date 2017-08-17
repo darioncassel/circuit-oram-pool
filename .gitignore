@@ -1,0 +1,6 @@
+.vscode
+obliv/*.o
+oram/*.o
+test/*.o
+.DS_Store
+prog
