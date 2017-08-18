@@ -15,11 +15,7 @@
 
 void testOramAccess()
 {
-    GateCount = 0;
-    RanCount = 0;
-    
-    long long N = 2;
-    CircuitSetup(N, 1, 3);
+    CircuitSetup(2, 1, 3);
     PoolSetup();
 
     int n = 1000000;
