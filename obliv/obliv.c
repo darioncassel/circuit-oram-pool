@@ -65,15 +65,11 @@ void __obliv_c__assignBitKnown(OblivBit* dest, bool value)
     dest->knownValue = value; 
     dest->unknown = true;
     #ifdef POOL_GARB
-        //Alice Input
         AliceInput(&dest->pool.w, value, 1);
-        //Bob Input
         BobInput(&dest->pool.w, 1);
     #else
         #ifdef POOL_EVAL
-            //Alice Input
             AliceInput(&dest->pool.wE, 1);
-            //Bob Input
             BobInput(&dest->pool.wE, value, 1);
         #endif
     #endif
@@ -103,13 +99,11 @@ void __obliv_c__genOblivBool(__obliv_c__bool dest, bool x)
 
 void __obliv_c__revOblivBool(bool* dest, __obliv_c__bool src)
 {
-    
     #ifdef POOL_GARB
-        //Reveal to Alice
-        *dest = printf("%d ", AliceOutput(src.bits->pool.w));
+        *dest = AliceOutput(src.bits->pool.w)
+        printf("%d ", dest);
     #else
         #ifdef POOL_EVAL
-            //Reveal to Alice
             AliceOutput(src.bits->pool.wE);
         #endif
         *dest = src.bits[0].knownValue;
@@ -145,7 +139,15 @@ void __obliv_c__revOblivInt(int* dest, __obliv_c__int src)
     int* ret = malloc(int_byte_size * byte_size);
     *ret = 0;
     for ( int i = 0; i < int_byte_size * byte_size; i++ ) {
-        *ret |= (src.bits[i].knownValue << i);
+        #ifdef POOL_GARB
+            *ret |= AliceOutput(src.bits[i].pool.w);
+            printf("%d ", ret);
+        #else
+            #ifdef POOL_EVAL
+                AliceOutput(src.bits[i].pool.wE);
+            #endif
+            *ret |= (src.bits[i].knownValue << i);
+        #endif
     }
     memcpy(dest, ret, int_byte_size);
 }

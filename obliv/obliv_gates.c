@@ -30,6 +30,14 @@ void __obliv_c__gateXOR(OblivBit* dest, const OblivBit* a, const OblivBit* b)
     #ifdef DEBUG_METRICS_ON
         __debug__XOR_count++;
     #endif
+    #ifdef POOL_EVAL
+        dest->pool.wE = XorGate(a->pool.wE, a->pool.wE);
+    #else
+        #ifdef POOL_GARB
+            dest->pool.w = XorGate(a->pool.w, a->pool.w);
+        #endif
+        dest->knownValue = (a->knownValue && b->knownValue);
+    #endif
     dest->knownValue = (!!a->knownValue != !!b->knownValue);
     dest->unknown = true;
 }

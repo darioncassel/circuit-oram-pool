@@ -3,7 +3,6 @@
 #include "../oram/copy.h"
 #include "../oram/circuit_oram.h"
 
-
 #ifdef POOL_GARB
     #include "../Pool/ZH128/Garb/server.h"
     typedef Wire wire;
@@ -12,6 +11,7 @@
     #include "../Pool/ZH128/Eval/client.h"
     typedef WireE wire;
 #endif
+
 
 void testOramAccess()
 {
@@ -46,8 +46,9 @@ void testOramAccess()
     __obliv_c__bool cond = __obliv_c__newBool();
     __obliv_c__genOblivBool(cond, true);
 
-    // Write to ram
-    /*for (int i = 0; i < n; ++i) {
+    // Commented out for metrics gathering:
+    /* Write to ram
+    for (int i = 0; i < n; ++i) {
         __obliv_c__int tmp2 = __obliv_c__newInt();
         __obliv_c__genOblivInt(tmp2, i);
         ocOramWrite(cond, ram, tmp2, content + i);
@@ -58,16 +59,10 @@ void testOramAccess()
     int *outputs = malloc(size * sizeof(int));
     for (int i = 0; i < size; ++i) { 
         ocOramRead(cond, &output, ram, indices[i]);
+        // Commented out for metrics gathering:
         // __obliv_c__revOblivInt(outputs + i, output);
     }
 
-    // Print output
-    /*for (int i = 0; i < size; ++i) { 
-        printf("%d, ", outputs[i]);
-    }
-    printf("\n");*/
-
-    // exchangeInputs(args, size, n);
     ocOramRelease(ram);
     free(indices);
     free(content);
