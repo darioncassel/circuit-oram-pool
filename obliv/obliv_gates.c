@@ -13,10 +13,11 @@ void __obliv_c__gateAND(OblivBit* dest, const OblivBit* a, const OblivBit* b)
     #endif
     #ifdef POOL_EVAL
         dest->pool.wE = PoolAnd(a->pool.wE, b->pool.wE);
-    #else
-        #ifdef POOL_GARB
-            dest->pool.w = PoolAnd(a->pool.w, b->pool.w);
-        #endif
+    #endif
+    #ifdef POOL_GARB
+        dest->pool.w = PoolAnd(a->pool.w, b->pool.w);
+    #endif
+    #ifdef OBLIV_KNOWN
         dest->knownValue = (a->knownValue && b->knownValue);
     #endif
     dest->unknown = true;
@@ -24,8 +25,10 @@ void __obliv_c__gateAND(OblivBit* dest, const OblivBit* a, const OblivBit* b)
 
 void __obliv_c__gateOR(OblivBit* dest, const OblivBit* a, const OblivBit* b)
 {
-    dest->knownValue = (a->knownValue || b->knownValue);
-    dest->unknown = true; 
+    #ifdef OBLIV_KNOWN
+        dest->knownValue = (a->knownValue || b->knownValue);
+        dest->unknown = true;
+    #endif
 }
 
 void __obliv_c__gateXOR(OblivBit* dest, const OblivBit* a, const OblivBit* b)
@@ -35,10 +38,11 @@ void __obliv_c__gateXOR(OblivBit* dest, const OblivBit* a, const OblivBit* b)
     #endif
     #ifdef POOL_EVAL
         dest->pool.wE = XorGate(a->pool.wE, b->pool.wE);
-    #else
-        #ifdef POOL_GARB
-            dest->pool.w = XorGate(a->pool.w, b->pool.w);
-        #endif
+    #endif
+    #ifdef POOL_GARB
+        dest->pool.w = XorGate(a->pool.w, b->pool.w);
+    #endif
+    #ifdef OBLIV_KNOWN
         dest->knownValue = (!!a->knownValue != !!b->knownValue);
     #endif
     dest->unknown = true;
@@ -46,6 +50,8 @@ void __obliv_c__gateXOR(OblivBit* dest, const OblivBit* a, const OblivBit* b)
 
 void __obliv_c__gateNOT(OblivBit* dest, const OblivBit* a)
 {
-    dest->knownValue = !a->knownValue;
-    dest->unknown = a->unknown;
+    #ifdef OBLIV_KNOWN
+        dest->knownValue = !a->knownValue;
+        dest->unknown = a->unknown;
+    #endif
 }

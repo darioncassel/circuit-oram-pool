@@ -62,18 +62,30 @@ void __obliv_c__copyBits(OblivBit* dest, const OblivBit* src, __obliv_c__size_t 
 
 void __obliv_c__assignBitKnown(OblivBit* dest, bool value)
 { 
-    bool val_box[1];
-    val_box[0] = value;
+    bool valbox[1];
+    valbox[0] = value;
     #ifdef POOL_GARB
-        AliceInput(&dest->pool.w, val_box, 1);
-        BobInput(&dest->pool.w, 1);
-    #else
-        #ifdef POOL_EVAL
-            AliceInput(&dest->pool.wE, 1);
-            BobInput(&dest->pool.wE, val_box, 1);
-        #endif
+        AliceInput(&dest->pool.w, valbox, 1);
+        // BobInput(&dest->pool.w, 1);
+        // dest->pool.w = One;
+    #endif
+    #ifdef POOL_EVAL
+        AliceInput(&dest->pool.wE, 1);
+        // BobInput(&dest->pool.wE, val_box, 1);
+        // dest->pool.wE = One;
+    #endif
+    #ifdef OBLIV_KNOWN
         dest->knownValue = value; 
     #endif
+    #ifdef POOL_EVAL
+        // PBprint(One.W.P.B);
+        // PBprint(dest->pool.wE.W.P.B);
+    #endif
+    #ifdef POOL_GARB
+        // PBprint(One.P);
+        // PBprint(dest->pool.w.P);
+    #endif
+    // exit(0);
     dest->unknown = true;
 }
 
@@ -84,14 +96,18 @@ static inline bool __obliv_c__known(const OblivBit* o) {
 bool __obliv_c__bitIsKnown(bool* v, const OblivBit* bit)
 { 
     if(__obliv_c__known(bit)) {
-        *v = bit->knownValue;
+        #ifdef OBLIV_KNOWN
+            *v = bit->knownValue;
+        #endif
     }
     return __obliv_c__known(bit);
 }
 
 void __obliv_c__flipBit(OblivBit* dest) 
-{ 
-    dest->knownValue = !dest->knownValue; 
+{
+    #ifdef OBLIV_KNOWN
+        dest->knownValue = !dest->knownValue;
+    #endif
 }
 
 void __obliv_c__genOblivBool(__obliv_c__bool dest, bool x) 
@@ -103,10 +119,11 @@ void __obliv_c__revOblivBool(bool* dest, __obliv_c__bool src)
 {
     #ifdef POOL_GARB
         *dest = AliceOutput(src.bits->pool.w);
-    #else
-        #ifdef POOL_EVAL
-            AliceOutput(src.bits->pool.wE);
-        #endif
+    #endif
+    #ifdef POOL_EVAL
+        AliceOutput(src.bits->pool.wE);
+    #endif
+    #ifdef OBLIV_KNOWN
         *dest = src.bits[0].knownValue;
     #endif
 }
@@ -142,10 +159,11 @@ void __obliv_c__revOblivInt(int* dest, __obliv_c__int src)
     for ( int i = 0; i < int_byte_size * byte_size; i++ ) {
         #ifdef POOL_GARB
             *ret |= AliceOutput(src.bits[i].pool.w);
-        #else
-            #ifdef POOL_EVAL
-                AliceOutput(src.bits[i].pool.wE);
-            #endif
+        #endif
+        #ifdef POOL_EVAL
+            AliceOutput(src.bits[i].pool.wE);
+        #endif
+        #ifdef OBLIV_KNOWN
             *ret |= (src.bits[i].knownValue << i);
         #endif
     }
@@ -181,7 +199,9 @@ void __obliv_c__revOblivFloat(float* dest, OblivBit* bits)
     int bit_number;
     for ( int i = 0; i < float_byte_size * byte_size; i++ ) {
         bit_number = i % byte_size;
-        currentByte |= (bits[i].knownValue << bit_number);
+        #ifdef OBLIV_KNOWN
+            currentByte |= (bits[i].knownValue << bit_number);
+        #endif
         if (bit_number == byte_size - 1) {
             floatBytes[j] = currentByte;
             j++;
@@ -206,11 +226,15 @@ void __obliv_c__setBitAnd(OblivBit* dest, const OblivBit* a, const OblivBit* b)
         if (!__obliv_c__known(a)) { 
             const OblivBit* t = a; a = b; b = t; 
         }
+        #ifdef OBLIV_KNOWN
         if (a->knownValue) {
             __obliv_c__copyBit(dest, b);
         } else {
+        #endif
             __obliv_c__assignBitKnown(dest,false);
+        #ifdef OBLIV_KNOWN
         }
+        #endif
     } else {
         __obliv_c__gateAND(dest, a, b);
     }
@@ -222,11 +246,15 @@ void __obliv_c__setBitOr(OblivBit* dest, const OblivBit* a, const OblivBit* b)
         if (!__obliv_c__known(a)) { 
             const OblivBit* t = a; a = b; b = t; 
         }
+        #ifdef OBLIV_KNOWN
         if (!a->knownValue) {
             __obliv_c__copyBit(dest, b);
         } else {
+        #endif
             __obliv_c__assignBitKnown(dest, true);
+        #ifdef OBLIV_KNOWN
         }
+        #endif
     } else {
         __obliv_c__gateOR(dest, a, b);
     }
@@ -239,7 +267,9 @@ void __obliv_c__setBitXor(OblivBit* dest, const OblivBit* a, const OblivBit* b)
         if (!__obliv_c__known(a)) { 
             const OblivBit* t = a; a = b; b = t;
         }
-        v = a->knownValue;
+        #ifdef OBLIV_KNOWN
+            v = a->knownValue;
+        #endif
         __obliv_c__copyBit(dest,b);
         if (v) {
             __obliv_c__flipBit(dest);
@@ -252,8 +282,10 @@ void __obliv_c__setBitXor(OblivBit* dest, const OblivBit* a, const OblivBit* b)
 void __obliv_c__setBitNot(OblivBit* dest ,const OblivBit* a)
 { 
     if (__obliv_c__known(a)) { 
-        *dest = *a; 
-        dest->knownValue = !dest->knownValue; 
+        *dest = *a;
+        #ifdef OBLIV_KNOWN
+            dest->knownValue = !dest->knownValue;
+        #endif
     } else {
         __obliv_c__gateNOT(dest, a); 
     }
@@ -604,7 +636,9 @@ void free_obliv(__obliv_c__bool cond, void* ptr) {
 void __obliv_c__dbgPrintOblivBits(OblivBit* bits, int size) 
 {
 	for (int i = 0; i < size; i++) {
-		printf("%d", bits[i].knownValue);
+        #ifdef OBLIV_KNOWN
+		    printf("%d", bits[i].knownValue);
+        #endif
 	}
 	printf("\n");
 }

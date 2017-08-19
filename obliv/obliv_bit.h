@@ -28,13 +28,15 @@
 typedef struct {
     bool unknown;
     union {
-        bool knownValue;
-        struct {
-            union {
-                bool value;
-                bool inverted;
-            };
-        } yao;
+        #ifdef OBLIV_KNOWN
+            bool knownValue;
+            struct {
+                union {
+                    bool value;
+                    bool inverted;
+                };
+            } yao;
+        #endif
         struct {
             #ifdef POOL_GARB
                 Wire w;
