@@ -1,6 +1,8 @@
 #ifndef OBLIV_BIT_H
 #define OBLIV_BIT_H
 
+#include <mm_malloc.h>
+
 #ifdef POOL_EVAL
     #include "../Pool/ZH128/Eval/InputProcess.h"
     #include "../Pool/ZH128/Eval/CircuitBuild.h"

@@ -36,9 +36,9 @@ void decoderEn(__obliv_c__bool* dest, __obliv_c__bool en,
 void ocLinearOramRelease(OcOram* super) 
 { 
     OcLinearOram* ram = (OcLinearOram*) super; // CAST(super);
-    free(ram->data);
-    free(ram->flags);
-    free(ram);
+    // _mm_free(ram->data);
+    // _mm_free(ram->flags);
+    // _mm_free(ram);
 }
 
 void ocLinearOramAccess(__obliv_c__bool cond, OcOram* super, __obliv_c__int index, OcOramAccessCb f, void* arg) // obliv
@@ -59,8 +59,8 @@ void ocLinearOramAccess(__obliv_c__bool cond, OcOram* super, __obliv_c__int inde
 
 OcLinearOram* ocLinearOramNew(OcCopy* cpy, void* data, int n)
 {
-    OcLinearOram* ram = malloc(sizeof(*ram));
-    ram->data = malloc(cpy->eltsize * n);
+    OcLinearOram* ram = _mm_malloc(sizeof(*ram), 32);
+    ram->data = _mm_malloc(cpy->eltsize * n, 32);
     if (data) {
         memcpy(ram->data, data, cpy->eltsize * n);
     } else {

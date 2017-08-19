@@ -50,7 +50,7 @@ void testOramAccess()
 
     // Read from ram
     __obliv_c__int output = __obliv_c__newInt();
-    int *outputs = malloc(size * sizeof(int));
+    int *outputs = _mm_malloc(size * sizeof(int), 32);
     for (int i = 0; i < size; ++i) { 
         ocOramRead(cond, &output, ram, indices[i]);
         // Commented out for metrics gathering:
@@ -58,8 +58,8 @@ void testOramAccess()
     }
 
     ocOramRelease(ram);
-    free(indices);
-    free(content);
+    // _mm_free(indices);
+    // _mm_free(content);
 }
 
 int main(int argc, char ** argv) 

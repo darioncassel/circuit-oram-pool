@@ -23,7 +23,7 @@ CircuitOram* ckt_initialize_more_param(int N, OcCopy* cpy, int recursion_factor,
 	res->cutoff = cutoff;
 	res->recursion_factor = recursion_factor;
 	res->orams = calloc(sizeof(NonRecursiveOram*), 10);
-    res->poscpy = malloc(sizeof(OcCopy) * 10);
+    res->poscpy = _mm_malloc(sizeof(OcCopy) * 10, 32);
 
 	res->orams[0] = nro_initialize(N, cpy);
 
@@ -66,11 +66,11 @@ void ckt_release(OcOram* super) {
 		nro_release(oram->orams[i]);
 	}
 	ocOramRelease(oram->base);
-	free(oram->poscpy);
-	free(oram->orams);
+	// _mm_free(oram->poscpy);
+	// _mm_free(oram->orams);
 	// releaseBCipherRandomGen(oram->gen);
-	free(oram->rand_pool);
-	free(oram);
+	// _mm_free(oram->rand_pool);
+	// _mm_free(oram);
 }
 
 void ckt_read(__obliv_c__bool cond, CircuitOram* oram, __obliv_c__int index, void* data) // obliv 
@@ -222,10 +222,10 @@ void put_bits(__obliv_c__bool cond, __obliv_c__bool* data_chunk, __obliv_c__int 
 void get_rand_obliv(__obliv_c__bool cond, /*BCipherRandomGen*/void* gen, __obliv_c__bool * data, int len) // obliv
 {
    // ~obliv(){
-      bool* rand_bool = malloc(len * sizeof(bool));
-      // OblivInputs* specs = malloc(sizeof(OblivInputs) * len);
-      // OblivInputs* specs2 = malloc(sizeof(OblivInputs) * len);
-      __obliv_c__bool* data1 = malloc(sizeof(__obliv_c__bool) * len);
+      bool* rand_bool = _mm_malloc(len * sizeof(bool), 32);
+      // OblivInputs* specs = _mm_malloc(sizeof(OblivInputs) * len);
+      // OblivInputs* specs2 = _mm_malloc(sizeof(OblivInputs) * len);
+      __obliv_c__bool* data1 = _mm_malloc(sizeof(__obliv_c__bool) * len, 32);
 	  
 	  //***************************************************************
 	  // TODO: Fix this code
@@ -251,9 +251,9 @@ void get_rand_obliv(__obliv_c__bool cond, /*BCipherRandomGen*/void* gen, __obliv
       feedOblivInputs(specs2, len, 2);*/
       for(int i = 0; i < len; ++i)
          __obliv_c__boolXor(data[i], data[i], data1[i]);
-      free(rand_bool);
-      /*free(specs);
-      free(specs2);
-      free(data1);*/
+      // _mm_free(rand_bool);
+      /*// _mm_free(specs);
+      // _mm_free(specs2);
+      // _mm_free(data1);*/
    // }
 }

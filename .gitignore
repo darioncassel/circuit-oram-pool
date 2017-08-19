@@ -4,3 +4,4 @@ oram/*.o
 test/*.o
 .DS_Store
 prog
+.dSYM/

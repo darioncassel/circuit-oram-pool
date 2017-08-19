@@ -9,7 +9,7 @@ Path=Pool/ZH128
 CommonPath=$(Path)/Common
 GarbPath=$(Path)/Garb
 EvalPath=$(Path)/Eval
-CFLAGS= -w -I $(CommonPath) -msse4.2 -march=corei7-avx -o AESG.out `libgcrypt-config --cflags --libs`  -lm -O3 -D DEBUG_METRICS_ON -D MAC
+CFLAGS= -w -g -I $(CommonPath) -msse4.2 -march=corei7-avx -o AESG.out `libgcrypt-config --cflags --libs`  -lm -O3 -D DEBUG_METRICS_ON -D MAC
 CFLAGG=$(CFLAGS) -I $(GarbPath) -D POOL_GARB
 CFLAGE=$(CFLAGS) -I $(EvalPath) -D POOL_EVAL
 

@@ -7,7 +7,7 @@
 __obliv_c__int __obliv_c__newInt(void)
 {
 	__obliv_c__int newInt;
-	newInt.bits = malloc(sizeof(OblivBit) * 32);
+	newInt.bits = _mm_malloc(sizeof(OblivBit) * 32, 32);
     if (newInt.bits == NULL) {
         exit(EXIT_FAILURE);
     }
@@ -17,7 +17,7 @@ __obliv_c__int __obliv_c__newInt(void)
 __obliv_c__uInt __obliv_c__newUInt(void)
 {
 	__obliv_c__uInt newUInt;
-	newUInt.bits = malloc(sizeof(OblivBit) * 32);
+	newUInt.bits = _mm_malloc(sizeof(OblivBit) * 32, 32);
     if (newUInt.bits == NULL) {
         exit(EXIT_FAILURE);
     }
@@ -27,7 +27,7 @@ __obliv_c__uInt __obliv_c__newUInt(void)
 __obliv_c__bool __obliv_c__newBool(void)
 {
 	__obliv_c__bool newBool;
-	newBool.bits = malloc(sizeof(OblivBit) * 1);
+	newBool.bits = _mm_malloc(sizeof(OblivBit) * 1, 32);
     if (newBool.bits == NULL) {
         exit(EXIT_FAILURE);
     }
@@ -37,7 +37,7 @@ __obliv_c__bool __obliv_c__newBool(void)
 __obliv_c__float __obliv_c__newFloat(void)
 {
 	__obliv_c__float newFloat;
-	newFloat.bits = malloc(sizeof(OblivBit) * 32);
+	newFloat.bits = _mm_malloc(sizeof(OblivBit) * 32, 32);
     if (newFloat.bits == NULL) {
         exit(1);
     }
@@ -103,7 +103,6 @@ void __obliv_c__revOblivBool(bool* dest, __obliv_c__bool src)
 {
     #ifdef POOL_GARB
         *dest = AliceOutput(src.bits->pool.w);
-        printf("%d ", dest);
     #else
         #ifdef POOL_EVAL
             AliceOutput(src.bits->pool.wE);
@@ -138,12 +137,11 @@ void __obliv_c__revOblivInt(int* dest, __obliv_c__int src)
 {
     int int_byte_size = sizeof(int);
     int byte_size = sizeof(char) * 8;
-    int* ret = malloc(int_byte_size * byte_size);
+    int* ret = _mm_malloc(int_byte_size * byte_size, 32);
     *ret = 0;
     for ( int i = 0; i < int_byte_size * byte_size; i++ ) {
         #ifdef POOL_GARB
             *ret |= AliceOutput(src.bits[i].pool.w);
-            printf("%d ", ret);
         #else
             #ifdef POOL_EVAL
                 AliceOutput(src.bits[i].pool.wE);
@@ -600,7 +598,7 @@ void *calloc_obliv(__obliv_c__bool cond, __obliv_c__size_t nitems, __obliv_c__si
 }
 
 void free_obliv(__obliv_c__bool cond, void* ptr) {
-    free(ptr);
+    // _mm_free(ptr);
 }
 
 void __obliv_c__dbgPrintOblivBits(OblivBit* bits, int size) 
