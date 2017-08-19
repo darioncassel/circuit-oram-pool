@@ -9,10 +9,10 @@ void __obliv_c__gateAND(OblivBit* dest, const OblivBit* a, const OblivBit* b)
         __debug__AND_count++;
     #endif
     #ifdef POOL_EVAL
-        dest->pool.wE = PoolAnd(a->pool.wE, a->pool.wE);
+        dest->pool.wE = *(WireE*) PoolAnd(a->pool.wE, a->pool.wE);
     #else
         #ifdef POOL_GARB
-            dest->pool.w = PoolAnd(a->pool.w, a->pool.w);
+            dest->pool.w = *(Wire*) PoolAnd(a->pool.w, a->pool.w);
         #endif
         dest->knownValue = (a->knownValue && b->knownValue);
     #endif

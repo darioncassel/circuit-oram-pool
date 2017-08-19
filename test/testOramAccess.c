@@ -5,11 +5,9 @@
 
 #ifdef POOL_GARB
     #include "../Pool/ZH128/Garb/server.h"
-    typedef Wire wire;
 #endif
 #ifdef POOL_EVAL
     #include "../Pool/ZH128/Eval/client.h"
-    typedef WireE wire;
 #endif
 
 
@@ -64,7 +62,8 @@ void testOramAccess()
     free(content);
 }
 
-int main(int argc, char ** argv) {
+int main(int argc, char ** argv) 
+{
     int c;
     c = atoi(argv[1]);
     opensocket(c);

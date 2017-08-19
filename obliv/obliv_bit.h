@@ -3,11 +3,11 @@
 
 #ifdef POOL_EVAL
     #include "../Pool/ZH128/Eval/InputProcess.h"
-    #include "../Pool/PoolCode/Eval/PoolAnd.h"
+    #include "../Pool/ZH128/Eval/CircuitBuild.h"
 #endif
 #ifdef POOL_GARB
     #include "../Pool/ZH128/Garb/InputProcess.h"
-    #include "../Pool/PoolCode/Garb/PoolAnd.h"
+    #include "../Pool/ZH128/Garb/CircuitBuild.h"
 #endif
 
 #define bool int

@@ -100,7 +100,7 @@ void __obliv_c__genOblivBool(__obliv_c__bool dest, bool x)
 void __obliv_c__revOblivBool(bool* dest, __obliv_c__bool src)
 {
     #ifdef POOL_GARB
-        *dest = AliceOutput(src.bits->pool.w)
+        *dest = AliceOutput(src.bits->pool.w);
         printf("%d ", dest);
     #else
         #ifdef POOL_EVAL
