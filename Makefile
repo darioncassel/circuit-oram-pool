@@ -22,7 +22,7 @@ PoolFileE= Pool/PoolCode/Eval/PoolAnd.c Pool/PoolCode/Eval/PoolAnd.h Pool/PoolCo
 
 OblivFiles = obliv/obliv.c obliv/obliv_gates.c oram/block.c oram/circuit_oram.c oram/copy.c oram/linear_oram.c oram/nonrecursive_oram.c oram/oram.c
 
-main:	eval garb
+main: garb eval
 
 eval: $(ZHFileC) $(ZHFileE) $(PoolFileE) $(OblivFiles) test/testOramAccess.c
 	$(C) $(ZHFileC) $(ZHFileE) $(PoolFileE) $(OblivFiles) test/testOramAccess.c $(CFLAGE) -o pool_eval

@@ -3,5 +3,7 @@ obliv/*.o
 oram/*.o
 test/*.o
 .DS_Store
-prog
-.dSYM/
+pool_eval
+pool_garb
+pool_eval.dSYM/*
+pool_garb.dSYM/*

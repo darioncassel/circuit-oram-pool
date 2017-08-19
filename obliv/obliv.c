@@ -39,7 +39,7 @@ __obliv_c__float __obliv_c__newFloat(void)
 	__obliv_c__float newFloat;
 	newFloat.bits = _mm_malloc(sizeof(OblivBit) * 32, 32);
     if (newFloat.bits == NULL) {
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 	return newFloat;
 }
@@ -66,26 +66,13 @@ void __obliv_c__assignBitKnown(OblivBit* dest, bool value)
     valbox[0] = value;
     #ifdef POOL_GARB
         AliceInput(&dest->pool.w, valbox, 1);
-        // BobInput(&dest->pool.w, 1);
-        // dest->pool.w = One;
     #endif
     #ifdef POOL_EVAL
         AliceInput(&dest->pool.wE, 1);
-        // BobInput(&dest->pool.wE, val_box, 1);
-        // dest->pool.wE = One;
     #endif
     #ifdef OBLIV_KNOWN
         dest->knownValue = value; 
     #endif
-    #ifdef POOL_EVAL
-        // PBprint(One.W.P.B);
-        // PBprint(dest->pool.wE.W.P.B);
-    #endif
-    #ifdef POOL_GARB
-        // PBprint(One.P);
-        // PBprint(dest->pool.w.P);
-    #endif
-    // exit(0);
     dest->unknown = true;
 }
 
@@ -96,9 +83,7 @@ static inline bool __obliv_c__known(const OblivBit* o) {
 bool __obliv_c__bitIsKnown(bool* v, const OblivBit* bit)
 { 
     if(__obliv_c__known(bit)) {
-        #ifdef OBLIV_KNOWN
-            *v = bit->knownValue;
-        #endif
+        *v = bit->knownValue;
     }
     return __obliv_c__known(bit);
 }
@@ -199,9 +184,7 @@ void __obliv_c__revOblivFloat(float* dest, OblivBit* bits)
     int bit_number;
     for ( int i = 0; i < float_byte_size * byte_size; i++ ) {
         bit_number = i % byte_size;
-        #ifdef OBLIV_KNOWN
-            currentByte |= (bits[i].knownValue << bit_number);
-        #endif
+        currentByte |= (bits[i].knownValue << bit_number);
         if (bit_number == byte_size - 1) {
             floatBytes[j] = currentByte;
             j++;
@@ -226,15 +209,11 @@ void __obliv_c__setBitAnd(OblivBit* dest, const OblivBit* a, const OblivBit* b)
         if (!__obliv_c__known(a)) { 
             const OblivBit* t = a; a = b; b = t; 
         }
-        #ifdef OBLIV_KNOWN
         if (a->knownValue) {
             __obliv_c__copyBit(dest, b);
         } else {
-        #endif
             __obliv_c__assignBitKnown(dest,false);
-        #ifdef OBLIV_KNOWN
         }
-        #endif
     } else {
         __obliv_c__gateAND(dest, a, b);
     }
@@ -246,15 +225,11 @@ void __obliv_c__setBitOr(OblivBit* dest, const OblivBit* a, const OblivBit* b)
         if (!__obliv_c__known(a)) { 
             const OblivBit* t = a; a = b; b = t; 
         }
-        #ifdef OBLIV_KNOWN
         if (!a->knownValue) {
             __obliv_c__copyBit(dest, b);
         } else {
-        #endif
             __obliv_c__assignBitKnown(dest, true);
-        #ifdef OBLIV_KNOWN
         }
-        #endif
     } else {
         __obliv_c__gateOR(dest, a, b);
     }
@@ -267,9 +242,7 @@ void __obliv_c__setBitXor(OblivBit* dest, const OblivBit* a, const OblivBit* b)
         if (!__obliv_c__known(a)) { 
             const OblivBit* t = a; a = b; b = t;
         }
-        #ifdef OBLIV_KNOWN
-            v = a->knownValue;
-        #endif
+        v = a->knownValue;
         __obliv_c__copyBit(dest,b);
         if (v) {
             __obliv_c__flipBit(dest);
@@ -427,7 +400,7 @@ void __obliv_c__setBitsAdd(void* vdest, void* carryOut,
 		if (carryIn && carryOut) {
 			__obliv_c__copyBit(carryOut, carryIn);
 		}
-    		return;
+    	return;
  	}
   	if (carryIn) {
 		__obliv_c__copyBit(&carry, carryIn);
@@ -437,11 +410,11 @@ void __obliv_c__setBitsAdd(void* vdest, void* carryOut,
   	// skip AND on last bit if carryOut==NULL
   	skipLast = (carryOut == NULL);
   	while (size-->skipLast) {
-	       	__obliv_c__setBitXor(&axc,op1,&carry);
-    		__obliv_c__setBitXor(&bxc,op2,&carry);
-    		__obliv_c__setBitXor(dest,op1,&bxc);
-    		__obliv_c__setBitAnd(&t,&axc,&bxc);
-    		__obliv_c__setBitXor(&carry,&carry,&t);
+        __obliv_c__setBitXor(&axc,op1,&carry);
+        __obliv_c__setBitXor(&bxc,op2,&carry);
+        __obliv_c__setBitXor(dest,op1,&bxc);
+        __obliv_c__setBitAnd(&t,&axc,&bxc);
+        __obliv_c__setBitXor(&carry,&carry,&t);
    	 	++dest; 
 		++op1; 
 		++op2;
@@ -450,7 +423,7 @@ void __obliv_c__setBitsAdd(void* vdest, void* carryOut,
 		__obliv_c__copyBit(carryOut,&carry);
 	} else { 
 		__obliv_c__setBitXor(&axc,op1,&carry);
-    		__obliv_c__setBitXor(dest,&axc,op2);
+    	__obliv_c__setBitXor(dest,&axc,op2);
   	}
 }
 
@@ -636,9 +609,7 @@ void free_obliv(__obliv_c__bool cond, void* ptr) {
 void __obliv_c__dbgPrintOblivBits(OblivBit* bits, int size) 
 {
 	for (int i = 0; i < size; i++) {
-        #ifdef OBLIV_KNOWN
-		    printf("%d", bits[i].knownValue);
-        #endif
+		printf("%d", bits[i].knownValue);
 	}
 	printf("\n");
 }

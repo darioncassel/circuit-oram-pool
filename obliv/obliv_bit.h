@@ -28,22 +28,22 @@
 typedef struct {
     bool unknown;
     union {
-        #ifdef OBLIV_KNOWN
-            bool knownValue;
-            struct {
-                union {
-                    bool value;
-                    bool inverted;
-                };
-            } yao;
-        #endif
+        bool knownValue;
         struct {
-            #ifdef POOL_GARB
-                Wire w;
-            #endif
-            #ifdef POOL_EVAL
-                WireE wE;
-            #endif
+            union {
+                bool value;
+                bool inverted;
+            };
+        } yao;
+        struct {
+            union {
+                #ifdef POOL_GARB
+                    Wire w;
+                #endif
+                #ifdef POOL_EVAL
+                    WireE wE;
+                #endif
+            }
         } pool;
     };
 } OblivBit;
