@@ -3,8 +3,17 @@
 #include <stdio.h>
 #include "obliv_bit.h"
 
-extern unsigned long long __debug__AND_count;
-extern unsigned long long __debug__XOR_count;
+#ifdef DEBUG_METRICS_ON
+    extern unsigned long long __debug__AND_count;
+    extern unsigned long long __debug__XOR_count;
+#endif
+
+#ifdef POOL_EVAL
+    WireE PoolAnd(WireE a, WireE b);
+#endif
+#ifdef POOL_GARB
+    Wire PoolAnd(Wire a, Wire b);
+#endif
 
 void __obliv_c__gateAND(OblivBit* dest, const OblivBit* a, const OblivBit* b);
 

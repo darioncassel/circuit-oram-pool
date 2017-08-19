@@ -62,17 +62,19 @@ void __obliv_c__copyBits(OblivBit* dest, const OblivBit* src, __obliv_c__size_t 
 
 void __obliv_c__assignBitKnown(OblivBit* dest, bool value)
 { 
-    dest->knownValue = value; 
-    dest->unknown = true;
+    bool val_box[1];
+    val_box[0] = value;
     #ifdef POOL_GARB
-        AliceInput(&dest->pool.w, value, 1);
+        AliceInput(&dest->pool.w, val_box, 1);
         BobInput(&dest->pool.w, 1);
     #else
         #ifdef POOL_EVAL
             AliceInput(&dest->pool.wE, 1);
-            BobInput(&dest->pool.wE, value, 1);
+            BobInput(&dest->pool.wE, val_box, 1);
         #endif
+        dest->knownValue = value; 
     #endif
+    dest->unknown = true;
 }
 
 static inline bool __obliv_c__known(const OblivBit* o) { 

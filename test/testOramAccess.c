@@ -16,7 +16,7 @@ void testOramAccess()
     CircuitSetup(2, 1, 3);
     PoolSetup();
 
-    int n = 1000000;
+    int n = 1000;
     int size = 1;
     __obliv_c__int *content = calloc(n, sizeof(__obliv_c__int));
     __obliv_c__int *indices = calloc(size, sizeof(__obliv_c__int));

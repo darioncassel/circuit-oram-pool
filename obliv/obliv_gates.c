@@ -1,7 +1,10 @@
 #include "obliv_gates.h"
 
-unsigned long long __debug__AND_count = 0;
-unsigned long long __debug__XOR_count = 0;
+
+#ifdef DEBUG_METRICS_ON
+    unsigned long long __debug__AND_count = 0;
+    unsigned long long __debug__XOR_count = 0;
+#endif
 
 void __obliv_c__gateAND(OblivBit* dest, const OblivBit* a, const OblivBit* b)
 {
@@ -9,10 +12,10 @@ void __obliv_c__gateAND(OblivBit* dest, const OblivBit* a, const OblivBit* b)
         __debug__AND_count++;
     #endif
     #ifdef POOL_EVAL
-        dest->pool.wE = *(WireE*) PoolAnd(a->pool.wE, a->pool.wE);
+        dest->pool.wE = PoolAnd(a->pool.wE, a->pool.wE);
     #else
         #ifdef POOL_GARB
-            dest->pool.w = *(Wire*) PoolAnd(a->pool.w, a->pool.w);
+            dest->pool.w = PoolAnd(a->pool.w, a->pool.w);
         #endif
         dest->knownValue = (a->knownValue && b->knownValue);
     #endif
