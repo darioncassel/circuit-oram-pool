@@ -532,12 +532,12 @@ void __obliv_c__setLShift(void* vdest, const void* vsrc, __obliv_c__size_t n,
 {
     int i;
     OblivBit *dest = vdest;
-    OblivBit *src = vsrc;
+    const OblivBit *src = vsrc;
     for (i = n - 1; i >= (signed)shiftAmt; --i) {
         __obliv_c__copyBit(dest + i, src + i - shiftAmt);
     }
     for (; i >= 0; --i) {
-        __obliv_c__assignBitKnown(dest, false);
+        __obliv_c__assignBitKnown(dest + i, false);
     }
 }
 
