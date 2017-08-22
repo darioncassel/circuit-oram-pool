@@ -2,14 +2,15 @@
 # Makefile for Pool - Circuit ORAM
 
 # Change this to appropriate compiler
-# for your machine (some version of gcc):
-C = gcc-7 -std=c99 
+# for your machine (some version of gcc)
+# remove -std=C99 unless on macOS.
+C = gcc-7 -std=c99
 
 Path=Pool/ZH128
 CommonPath=$(Path)/Common
 GarbPath=$(Path)/Garb
 EvalPath=$(Path)/Eval
-CFLAGS= -w -g -I $(CommonPath) -march=native -o AESG.out `libgcrypt-config --cflags --libs`  -lm -O3 -D DEBUG_METRICS_ON -D MAC
+CFLAGS= -w -I $(CommonPath) -march=native -o AESG.out `libgcrypt-config --cflags --libs`  -lm -O3 -D DEBUG_METRICS_ON -D MAC
 CFLAGG=$(CFLAGS) -I $(GarbPath) -D POOL_GARB
 CFLAGE=$(CFLAGS) -I $(EvalPath) -D POOL_EVAL
 
@@ -31,4 +32,4 @@ garb: $(ZHFileC) $(ZHFileG) $(PoolFileG) $(OblivFiles) test/testOramAccess.c
 	$(C) $(ZHFileC) $(ZHFileG) $(PoolFileG) $(OblivFiles) test/testOramAccess.c $(CFLAGG) -o pool_garb
 
 clean:
-	/bin/rm -f oram/*.o obliv/*.o test/*.o Pool/PoolCode/Eval/*.o Pool/ZH128/Common/*.o Pool/ZH128/Eval/*.o *.out
+	/bin/rm -f oram/*.o obliv/*.o test/*.o Pool/PoolCode/Eval/*.o Pool/PoolCode/Garb/*.o Pool/ZH128/Common/*.o Pool/ZH128/Eval/*.o Pool/ZH128/Garb/*.o *.out
