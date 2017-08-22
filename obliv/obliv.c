@@ -206,8 +206,6 @@ void __obliv_c__bitwiseOp(OblivBit* dest, const OblivBit* a,
 void __obliv_c__setBitAnd(OblivBit* dest, const OblivBit* a, const OblivBit* b)
 {
     if (__obliv_c__known(a) || __obliv_c__known(b)) {
-        printf("Bad branch!\n");
-        exit(EXIT_FAILURE);
         if (!__obliv_c__known(a)) { 
             const OblivBit* t = a; a = b; b = t; 
         }
@@ -548,6 +546,12 @@ void __obliv_c__intLShift(__obliv_c__int dest, __obliv_c__int src, int shift)
     __obliv_c__setLShift(dest.bits, src.bits, 32, shift);
 }
 
+void __obliv_c__setBitMux(OblivBit *dest, OblivBit *a, OblivBit *b) {
+    #ifdef POOL_GARB
+    #endif
+    #ifdef POOL_EVAL
+    #endif
+}
 
 void __obliv_c__ifThenElse(void* vdest, const void* vtsrc
                            , const void* vfsrc, __obliv_c__size_t size
@@ -556,13 +560,24 @@ void __obliv_c__ifThenElse(void* vdest, const void* vtsrc
     OblivBit x,a,c = *(const OblivBit*)vcond;
     OblivBit *dest=vdest;
     const OblivBit *tsrc = vtsrc, *fsrc = vfsrc;
-    while(size-- > 0) {
-        __obliv_c__setBitXor(&x, tsrc, fsrc);
-        __obliv_c__setBitAnd(&a, &c, &x);
-        __obliv_c__setBitXor(dest, &a, fsrc);
-        ++dest; 
-        ++fsrc; 
-        ++tsrc;
+    if (size == 32) {
+        while(size-- > 0) {
+            __obliv_c__setBitXor(&x, tsrc, fsrc);
+            __obliv_c__setBitMux(&a, &c, &x);
+            __obliv_c__setBitXor(dest, &a, fsrc);
+            ++dest; 
+            ++fsrc; 
+            ++tsrc;
+        }
+    } else {
+        while(size-- > 0) {
+            __obliv_c__setBitXor(&x, tsrc, fsrc);
+            __obliv_c__setBitAnd(&a, &c, &x);
+            __obliv_c__setBitXor(dest, &a, fsrc);
+            ++dest; 
+            ++fsrc; 
+            ++tsrc;
+        }
     }
 }
 
