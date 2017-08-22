@@ -13,13 +13,16 @@ void bool_to_int_obliv(__obliv_c__bool cond, __obliv_c__bool *bools, __obliv_c__
         for(; i >= 0; --i) {
             // *res = (*res << 1);
             __obliv_c__int tmp1 = __obliv_c__newInt();
+            __obliv_c__genOblivInt(tmp1, 0);
             __obliv_c__intLShift(tmp1, *res, 1);
             __obliv_c__intCondAssign(cond, *res, tmp1);
             // *res = (*res ^ (bools[i]));
             __obliv_c__int tmp2 = __obliv_c__newInt();
+            __obliv_c__genOblivInt(tmp2, 0);
             // TODO: Check this
             if (bools[i].bits == NULL) {
                 bools[i] = __obliv_c__newBool();
+                __obliv_c__genOblivBool(bools[i], false);
             }
             __obliv_c__setBitwiseXor(tmp2.bits, res->bits, bools[i].bits, 1);
             __obliv_c__intCondAssign(cond, *res, tmp2);

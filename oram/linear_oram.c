@@ -45,9 +45,9 @@ void ocLinearOramAccess(__obliv_c__bool cond, OcOram* super, __obliv_c__int inde
 {
     OcLinearOram* ram = (OcLinearOram*) super; // CAST(super);
     // ~obliv(en)
-    __obliv_c__uInt __obliv_uInt_tmp1;
-    __obliv_uInt_tmp1.bits = index.bits;
-    decoderEn(ram->flags, cond, __obliv_uInt_tmp1, super->n);
+    __obliv_c__uInt __obliv_tmp0 = __obliv_c__newUInt();
+    __obliv_tmp0.bits = index.bits;
+    decoderEn(ram->flags, cond, __obliv_tmp0, super->n);
     for (int i = 0; i < super->n; ++i) {
         // obliv if (ram->flags[i])
             __obliv_c__bool cond_res = __obliv_c__newBool();
@@ -66,7 +66,7 @@ OcLinearOram* ocLinearOramNew(OcCopy* cpy, void* data, int n)
     } else {
         ocCopyZeroFill(cpy, ram->data, n);
     }
-    ram->flags = calloc(n, sizeof(__obliv_c__bool));
+    ram->flags = calloc_mset(n, sizeof(__obliv_c__bool));
     OcOram *s = &ram->super;
     s->n = n;
     s->cpy = cpy;

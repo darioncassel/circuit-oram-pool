@@ -26,6 +26,7 @@ static void xorBits(const OcCopy* cpy, void* dest, const void* src, __obliv_c__s
         __obliv_c__size_t lim = c->eltsize / sizeof(__obliv_c__##t); \
         for (int i = 0; i < n; ++i) { \
             __obliv_c__bool cond_res = __obliv_c__newBool(); \
+            __obliv_c__genOblivBool(cond_res, false); \
             __obliv_c__boolAnd(cond_res, en, cond[i]); \
             for (int j = 0; j < lim; ++j) { \
                 __obliv_c__##t##CondAssign(cond_res, ((__obliv_c__##t*)dest)[i*lim+j], ((const __obliv_c__##t*)src)[i*lim+j]); \

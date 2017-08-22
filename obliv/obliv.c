@@ -205,7 +205,9 @@ void __obliv_c__bitwiseOp(OblivBit* dest, const OblivBit* a,
 
 void __obliv_c__setBitAnd(OblivBit* dest, const OblivBit* a, const OblivBit* b)
 {
-    if (__obliv_c__known(a) || __obliv_c__known(b)) { 
+    if (__obliv_c__known(a) || __obliv_c__known(b)) {
+        printf("Bad branch!\n");
+        exit(EXIT_FAILURE);
         if (!__obliv_c__known(a)) { 
             const OblivBit* t = a; a = b; b = t; 
         }
@@ -532,12 +534,12 @@ void __obliv_c__setLShift(void* vdest, const void* vsrc, __obliv_c__size_t n,
 {
     int i;
     OblivBit *dest = vdest;
-    const OblivBit *src = vsrc;
+    OblivBit *src = vsrc;
     for (i = n - 1; i >= (signed)shiftAmt; --i) {
         __obliv_c__copyBit(dest + i, src + i - shiftAmt);
     }
     for (; i >= 0; --i) {
-        __obliv_c__assignBitKnown(dest + i, false);
+        __obliv_c__assignBitKnown(dest, false);
     }
 }
 
@@ -547,15 +549,15 @@ void __obliv_c__intLShift(__obliv_c__int dest, __obliv_c__int src, int shift)
 }
 
 
-void __obliv_c__ifThenElse (void* vdest, const void* vtsrc
+void __obliv_c__ifThenElse(void* vdest, const void* vtsrc
                            , const void* vfsrc, __obliv_c__size_t size
                            , const void* vcond)
 {
     OblivBit x,a,c = *(const OblivBit*)vcond;
     OblivBit *dest=vdest;
     const OblivBit *tsrc = vtsrc, *fsrc = vfsrc;
-    while (size-- > 0) { 
-        __obliv_c__setBitXor(&x, tsrc, fsrc);
+    while(size-- > 0) {
+        __obliv_c__setBitAnd(&x, tsrc, fsrc);
         __obliv_c__setBitAnd(&a, &c, &x);
         __obliv_c__setBitXor(dest, &a, fsrc);
         ++dest; 
@@ -566,17 +568,23 @@ void __obliv_c__ifThenElse (void* vdest, const void* vtsrc
 
 void __obliv_c__condAssign(const void* cond, void* dest, const void* src, __obliv_c__size_t size)
 {
-    __obliv_c__ifThenElse (dest,src,dest,size,cond);
+    __obliv_c__ifThenElse(dest, src, dest, size, cond);
 }
 
 void __obliv_c__boolCondAssign(__obliv_c__bool cond, __obliv_c__bool dest, __obliv_c__bool src)
 {
     // TODO: Check this
+    if (cond.bits == NULL) {
+        cond = __obliv_c__newBool();
+        __obliv_c__genOblivBool(cond, true);
+    }
     if (dest.bits == NULL) {
         dest = __obliv_c__newBool();
+        __obliv_c__genOblivBool(dest, false);
     }
     if (src.bits == NULL) {
         src = __obliv_c__newBool();
+        __obliv_c__genOblivBool(src, false);
     }
     __obliv_c__condAssign(cond.bits, dest.bits, src.bits, 1);
 }
@@ -584,22 +592,33 @@ void __obliv_c__boolCondAssign(__obliv_c__bool cond, __obliv_c__bool dest, __obl
 void __obliv_c__intCondAssign(__obliv_c__bool cond, __obliv_c__int dest, __obliv_c__int src)
 {
     // TODO: Check this
+    if (cond.bits == NULL) {
+        cond = __obliv_c__newBool();
+        __obliv_c__genOblivBool(cond, true);
+    }
     if (dest.bits == NULL) {
         dest = __obliv_c__newInt();
+        __obliv_c__genOblivInt(dest, 0);
     }
     if (src.bits == NULL) {
         src = __obliv_c__newInt();
+        __obliv_c__genOblivInt(src, 0);
     }
     __obliv_c__condAssign(cond.bits, dest.bits, src.bits, 32);
 }
 
-void *calloc_obliv(__obliv_c__bool cond, __obliv_c__size_t nitems, __obliv_c__size_t size) {
-    void *ptr = calloc(nitems, size);
+void *calloc_mset(size_t __count, size_t __size) {
+    void *ptr = _mm_malloc(__size * __count, 32);
     if (ptr == NULL) {
         printf("Calloc failed!\n");
         exit(EXIT_FAILURE);
     }
+    memset(ptr, 0, __size * __count);
     return ptr;
+}
+
+void *calloc_obliv(__obliv_c__bool cond, __obliv_c__size_t nitems, __obliv_c__size_t size) {
+    return calloc_mset(nitems, size);
 }
 
 void free_obliv(__obliv_c__bool cond, void* ptr) {

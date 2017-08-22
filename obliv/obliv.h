@@ -62,6 +62,7 @@ void __obliv_c__intRShift(__obliv_c__int dest, __obliv_c__int src, int shift);
 void __obliv_c__intLShift(__obliv_c__int dest, __obliv_c__int src, int shift);
 void __obliv_c__intCondAssign(__obliv_c__bool cond, __obliv_c__int dest, __obliv_c__int src);
 void __obliv_c__boolCondAssign(__obliv_c__bool cond, __obliv_c__bool dest, __obliv_c__bool src);
+void *calloc_mset(size_t __count, size_t __size);
 void *calloc_obliv(__obliv_c__bool cond, __obliv_c__size_t nitems, __obliv_c__size_t size);
 void free_obliv(__obliv_c__bool cond, void* ptr);
 

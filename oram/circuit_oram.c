@@ -15,14 +15,14 @@ void get_random(__obliv_c__bool cond, CircuitOram * oram, __obliv_c__bool* res, 
 
 CircuitOram* ckt_initialize_more_param(int N, OcCopy* cpy, int recursion_factor, int cutoff)
 {
-	CircuitOram* res = calloc(sizeof(CircuitOram), 1);
+	CircuitOram* res = calloc_mset(1, sizeof(CircuitOram));
 	res->super.n = N;
 	res->super.cpy = cpy;
 	res->super.release = ckt_release;
 	res->super.access = ckt_apply;
 	res->cutoff = cutoff;
 	res->recursion_factor = recursion_factor;
-	res->orams = calloc(sizeof(NonRecursiveOram*), 10);
+	res->orams = calloc_mset(10, sizeof(NonRecursiveOram*));
     res->poscpy = _mm_malloc(sizeof(OcCopy) * 10, 32);
 
 	res->orams[0] = nro_initialize(N, cpy);
@@ -48,7 +48,7 @@ CircuitOram* ckt_initialize_more_param(int N, OcCopy* cpy, int recursion_factor,
 
 	res->rand_pool_cap = 200000;
 	res->rand_pool_size = 0;
-	res->rand_pool = calloc(sizeof(__obliv_c__bool), res->rand_pool_cap);
+	res->rand_pool = calloc_mset(res->rand_pool_cap, sizeof(__obliv_c__bool));
 	__obliv_c__bool cond = __obliv_c__newBool();
 	__obliv_c__genOblivBool(cond, true);
 	get_rand_obliv(cond, res->gen, res->rand_pool, res->rand_pool_cap);
@@ -127,9 +127,9 @@ void ckt_write(__obliv_c__bool cond, CircuitOram* oram, __obliv_c__int index, vo
 void update_trees(__obliv_c__bool cond, CircuitOram* oram, __obliv_c__int index, int level, __obliv_c__int* pos, __obliv_c__int* new_pos) // obliv
 {
 	int entry_size = oram->orams[level - 1]->position_label_size;
-	int block_size = oram->recursion_factor*entry_size;
+	int block_size = oram->recursion_factor * entry_size;
 	if (level == oram->num_recursion) {
-		__obliv_c__bool* bools = calloc_obliv(cond, sizeof(__obliv_c__bool), entry_size);
+		__obliv_c__bool* bools = calloc_obliv(cond, entry_size, sizeof(__obliv_c__bool));
 		ocOramRead(cond, bools, oram->base, index);
 		__obliv_c__bool* new_pos_bools = calloc_obliv(cond, sizeof(__obliv_c__bool), entry_size);
 		get_random(cond, oram, new_pos_bools, entry_size);
@@ -140,13 +140,15 @@ void update_trees(__obliv_c__bool cond, CircuitOram* oram, __obliv_c__int index,
 		free_obliv(cond, bools);
 		free_obliv(cond, new_pos_bools);
 	} else {
-		NonRecursiveOram* current_oram = oram->orams[level];
-		__obliv_c__bool* pos_map = calloc_obliv(cond, sizeof(__obliv_c__bool), block_size);
-		__obliv_c__bool* bools = calloc_obliv(cond, sizeof(__obliv_c__bool), entry_size);
-		__obliv_c__bool* new_pos_bools = calloc_obliv(cond, sizeof(__obliv_c__bool), entry_size);
+		NonRecursiveOram *current_oram = oram->orams[level];
+		__obliv_c__bool *pos_map = calloc_obliv(cond, block_size, sizeof(__obliv_c__bool));
+		__obliv_c__bool *bools = calloc_obliv(cond, entry_size, sizeof(__obliv_c__bool));
+		__obliv_c__bool *new_pos_bools = calloc_obliv(cond, entry_size, sizeof(__obliv_c__bool));
 
 		__obliv_c__int new_index = __obliv_c__newInt();
+		__obliv_c__genOblivInt(new_index, 0);
 		__obliv_c__int tmp_int1 = __obliv_c__newInt();
+		__obliv_c__genOblivInt(tmp_int1, 0);
 		__obliv_c__intRShift(tmp_int1, index, oram->orams[level - 1]->index_size - current_oram->index_size);
 		__obliv_c__intCondAssign(cond, new_index, tmp_int1);
 		__obliv_c__int f_pos = __obliv_c__newInt();
@@ -159,9 +161,11 @@ void update_trees(__obliv_c__bool cond, CircuitOram* oram, __obliv_c__int index,
 		nro_read_and_remove(cond, current_oram, new_index, f_pos, pos_map);
 
 		__obliv_c__int ith_pos = __obliv_c__newInt();
+		__obliv_c__genOblivInt(ith_pos, 0);
 		__obliv_c__int tmp_int2 = __obliv_c__newInt();
 		__obliv_c__genOblivInt(tmp_int2, (1 << (oram->orams[level - 1]->index_size-current_oram->index_size)) - 1);
 		__obliv_c__int tmp_int3 = __obliv_c__newInt();
+		__obliv_c__genOblivInt(tmp_int3, 0);
 		__obliv_c__intBitwiseAnd(tmp_int3, tmp_int2, index);
 		__obliv_c__intCondAssign(cond, ith_pos, tmp_int3);
 
@@ -184,7 +188,9 @@ void extract_bits(__obliv_c__bool cond, __obliv_c__bool* data_chunk, __obliv_c__
 	for(int i = 0; i < oram->recursion_factor; ++i) {
 		// obliv if(ith_pos == i) {
 		__obliv_c__bool cond_res = __obliv_c__newBool();
+		__obliv_c__genOblivBool(cond_res, false);
 		__obliv_c__bool tmp0 = __obliv_c__newBool();
+		__obliv_c__genOblivBool(tmp0, false);
 		__obliv_c__int tmp1 = __obliv_c__newInt();
 		__obliv_c__genOblivInt(tmp1, i);
 		__obliv_c__intEqual(tmp0, ith_pos, tmp1);
@@ -192,6 +198,7 @@ void extract_bits(__obliv_c__bool cond, __obliv_c__bool* data_chunk, __obliv_c__
 			for(int j = 0; j < entry_size; ++j) {
 				// res[j] = data_chunk[i*entry_size + j];
 				__obliv_c__bool tmp2 = __obliv_c__newBool();
+				__obliv_c__genOblivBool(tmp2, false);
 				// TODO: Fix this
 				// *tmp2.bits = data_chunk->bits[i*entry_size + j];
 				__obliv_c__boolCondAssign(cond_res, res[j], tmp2);
@@ -206,7 +213,9 @@ void put_bits(__obliv_c__bool cond, __obliv_c__bool* data_chunk, __obliv_c__int 
 	for(int i = 0; i < oram->recursion_factor; ++i) {
 		// obliv if(ith_pos == i) {
 		__obliv_c__bool cond_res = __obliv_c__newBool();
+		__obliv_c__genOblivBool(cond_res, false);
 		__obliv_c__bool tmp0 = __obliv_c__newBool();
+		__obliv_c__genOblivBool(tmp0, false);
 		__obliv_c__int tmp1 = __obliv_c__newInt();
 		__obliv_c__genOblivInt(tmp1, i);
 		__obliv_c__intEqual(tmp0, ith_pos, tmp1);

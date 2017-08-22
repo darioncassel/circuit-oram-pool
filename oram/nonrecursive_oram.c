@@ -29,7 +29,7 @@ NonRecursiveOram* nro_initialize(int _N, OcCopy* cpy)
 {
 	__obliv_c__bool cond = __obliv_c__newBool();
 	__obliv_c__genOblivBool(cond, true);
-	NonRecursiveOram* res = calloc_obliv(cond, sizeof(NonRecursiveOram), 1);
+	NonRecursiveOram* res = calloc_obliv(cond, 1, sizeof(NonRecursiveOram));
 	res->stash_size = ORAM_STASH_SIZE;
 	res->bucket_size = ORAM_BUCKET_SIZE;
 	res->cpy = cpy;
@@ -47,16 +47,16 @@ NonRecursiveOram* nro_initialize(int _N, OcCopy* cpy)
 	res->position_label_size = logN;
 	res->N = 1 << logN;
 
-	res->tree = calloc_obliv(cond, sizeof(Block**), res->N);
-	res->stash = calloc_obliv(cond, sizeof(Block*), res->stash_size);
+	res->tree = calloc_obliv(cond, res->N, sizeof(Block**));
+	res->stash = calloc_obliv(cond, res->stash_size, sizeof(Block*));
 
 	for(int i = 0; i < res->N; ++i) {
-		res->tree[i] = calloc_obliv(cond, sizeof(Block*), res->bucket_size);
+		res->tree[i] = calloc_obliv(cond, res->bucket_size, sizeof(Block*));
 		for(int j = 0; j < res->bucket_size; ++j) {
 			res->tree[i][j] = block_initialize(cond, res->cpy);
 		}
 	}
-
+	
 	for(int i = 0; i < res->stash_size; ++i) {
 		res->stash[i] = block_initialize(cond, res->cpy);
 	}
@@ -64,8 +64,8 @@ NonRecursiveOram* nro_initialize(int _N, OcCopy* cpy)
 	res->eviction_cnt = 0;
 	res->deepest_index = calloc_obliv(cond, res->index_size + 1, sizeof(__obliv_c__int));
 	res->deepest_depth = calloc_obliv(cond, res->index_size + 1, sizeof(__obliv_c__int));
-	res->deepest = calloc_obliv(cond, sizeof(__obliv_c__int), res->index_size + 1);
-	res->target = calloc_obliv(cond, sizeof(__obliv_c__int), res->index_size + 1);
+	res->deepest = calloc_obliv(cond, res->index_size + 1, sizeof(__obliv_c__int));
+	res->target = calloc_obliv(cond, res->index_size + 1, sizeof(__obliv_c__int));
 
 	res->hold = block_initialize(cond, res->cpy); 
 	res->to_write = block_initialize(cond, res->cpy); 
@@ -120,25 +120,32 @@ void bucket_read_and_remove(__obliv_c__bool cond, Block** blocks, int bucket_siz
 	for(int i = 0; i < ORAM_STASH_SIZE; ++i) {
 		// obliv if (blocks[i]->index == index & ( !blocks[i]->is_dummy)) {
 			__obliv_c__bool cond_res = __obliv_c__newBool();
+			__obliv_c__genOblivBool(cond_res, false);
 			__obliv_c__bool tmp0 = __obliv_c__newBool();
+			__obliv_c__genOblivBool(tmp0, false);
 			// !blocks[i]->is_dummy
 			// TODO: why this check?
 			if (blocks[i]->is_dummy.bits == NULL) {
 				blocks[i]->is_dummy = __obliv_c__newBool();
+				__obliv_c__genOblivBool(blocks[i]->is_dummy, false);
 			}
 			tmp0.bits = blocks[i]->is_dummy.bits;
 			__obliv_c__flipBit(tmp0.bits);
 			__obliv_c__bool tmp1 = __obliv_c__newBool();
+			__obliv_c__genOblivBool(tmp1, false);
 
 			// blocks[i]->index == index
 			__obliv_c__bool tmp2 = __obliv_c__newBool();
+			__obliv_c__genOblivBool(tmp2, false);
 			// TODO: why this check?
 			if (blocks[i]->index.bits == NULL) {
 				blocks[i]->index = __obliv_c__newInt();
+				__obliv_c__genOblivInt(blocks[i]->index, 0);
 			}
 			__obliv_c__intEqual(tmp2, blocks[i]->index, index);
 			// blocks[i]->index == index & ( !blocks[i]->is_dummy)
 			__obliv_c__bool tmp3 = __obliv_c__newBool();
+			__obliv_c__genOblivBool(tmp3, false);
 			__obliv_c__boolAnd(tmp3, tmp2, tmp1);
 			// obliv if
 			__obliv_c__boolAnd(cond_res, cond, tmp3);
@@ -146,8 +153,9 @@ void bucket_read_and_remove(__obliv_c__bool cond, Block** blocks, int bucket_siz
 			block_copy(cond_res, blocks[i], res, cpy);
 			// blocks[i]->is_dummy = true;
 			__obliv_c__bool tmp4 = __obliv_c__newBool();
-			__obliv_c__genOblivBool(tmp3, true);
+			__obliv_c__genOblivBool(tmp4, true);
 			blocks[i]->is_dummy = __obliv_c__newBool();
+			__obliv_c__genOblivBool(blocks[i]->is_dummy, false);
 			__obliv_c__boolCondAssign(cond_res, blocks[i]->is_dummy, tmp4);
 		// }
 	}
@@ -160,12 +168,15 @@ void bucket_add(__obliv_c__bool cond, Block** blocks, int bucket_size, Block* ne
 	for(int i = 0; i < bucket_size; ++i) {
 		// obliv if( blocks[i]->is_dummy & (!added) ) {
 			__obliv_c__bool cond_res = __obliv_c__newBool();
+			__obliv_c__genOblivBool(cond_res, false);
 			// (!added)
 			__obliv_c__bool tmp0 = __obliv_c__newBool();
+			__obliv_c__genOblivBool(tmp0, false);
 			__obliv_c__copyBit(tmp0.bits, added.bits);
 			__obliv_c__flipBit(tmp0.bits);
 			// blocks[i]->is_dummy & (!added)
 			__obliv_c__bool tmp1 = __obliv_c__newBool();
+			__obliv_c__genOblivBool(tmp1, false);
 			__obliv_c__boolAnd(tmp1, blocks[i]->is_dummy, tmp0);
 
 			__obliv_c__boolAnd(cond_res, cond, tmp1);
@@ -175,6 +186,7 @@ void bucket_add(__obliv_c__bool cond, Block** blocks, int bucket_size, Block* ne
 			__obliv_c__bool tmp2 = __obliv_c__newBool();
 			__obliv_c__genOblivBool(tmp2, true);
 			added = __obliv_c__newBool();
+			__obliv_c__genOblivBool(added, false);
 			__obliv_c__boolCondAssign(cond_res, added, tmp2);
 		// }
 	}
@@ -183,7 +195,7 @@ void bucket_add(__obliv_c__bool cond, Block** blocks, int bucket_size, Block* ne
 void path_read_and_remove(__obliv_c__bool cond, NonRecursiveOram* oram, __obliv_c__int index, Block* res) // obliv
 {
 	int bucket_size = oram->index_size * oram->bucket_size + oram->stash_size;
-	Block** arr = calloc_obliv(cond, sizeof(Block*), bucket_size);
+	Block **arr = calloc_obliv(cond, bucket_size, sizeof(Block*));
 	int cnt = 0;
 
 	for(int i = 0; i < oram->stash_size; ++i) {

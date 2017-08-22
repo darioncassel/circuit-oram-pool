@@ -3,13 +3,13 @@
 
 # Change this to appropriate compiler
 # for your machine (some version of gcc):
-C = gcc-4.8 -std=c99 
+C = gcc-7 -std=c99 
 
 Path=Pool/ZH128
 CommonPath=$(Path)/Common
 GarbPath=$(Path)/Garb
 EvalPath=$(Path)/Eval
-CFLAGS= -w -g -I $(CommonPath) -msse4.2 -march=corei7-avx -o AESG.out `libgcrypt-config --cflags --libs`  -lm -O3 -D DEBUG_METRICS_ON -D MAC
+CFLAGS= -w -g -I $(CommonPath) -march=native -o AESG.out `libgcrypt-config --cflags --libs`  -lm -O3 -D DEBUG_METRICS_ON -D MAC
 CFLAGG=$(CFLAGS) -I $(GarbPath) -D POOL_GARB
 CFLAGE=$(CFLAGS) -I $(EvalPath) -D POOL_EVAL
 
