@@ -557,7 +557,7 @@ void __obliv_c__ifThenElse(void* vdest, const void* vtsrc
     OblivBit *dest=vdest;
     const OblivBit *tsrc = vtsrc, *fsrc = vfsrc;
     while(size-- > 0) {
-        __obliv_c__setBitAnd(&x, tsrc, fsrc);
+        __obliv_c__setBitXor(&x, tsrc, fsrc);
         __obliv_c__setBitAnd(&a, &c, &x);
         __obliv_c__setBitXor(dest, &a, fsrc);
         ++dest; 
