@@ -588,7 +588,6 @@ void __obliv_c__condAssign(const void* cond, void* dest, const void* src, __obli
 
 void __obliv_c__boolCondAssign(__obliv_c__bool cond, __obliv_c__bool dest, __obliv_c__bool src)
 {
-    // TODO: Check this
     if (cond.bits == NULL) {
         cond = __obliv_c__newBool();
         __obliv_c__genOblivBool(cond, true);
@@ -606,7 +605,6 @@ void __obliv_c__boolCondAssign(__obliv_c__bool cond, __obliv_c__bool dest, __obl
 
 void __obliv_c__intCondAssign(__obliv_c__bool cond, __obliv_c__int dest, __obliv_c__int src)
 {
-    // TODO: Check this
     if (cond.bits == NULL) {
         cond = __obliv_c__newBool();
         __obliv_c__genOblivBool(cond, true);
@@ -637,7 +635,7 @@ void *calloc_obliv(__obliv_c__bool cond, __obliv_c__size_t nitems, __obliv_c__si
 }
 
 void free_obliv(__obliv_c__bool cond, void* ptr) {
-    // _mm_free(ptr);
+    _mm_free(ptr);
 }
 
 void __obliv_c__dbgPrintOblivBits(OblivBit* bits, int size) 

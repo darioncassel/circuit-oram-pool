@@ -124,7 +124,6 @@ void bucket_read_and_remove(__obliv_c__bool cond, Block** blocks, int bucket_siz
 			__obliv_c__bool tmp0 = __obliv_c__newBool();
 			__obliv_c__genOblivBool(tmp0, false);
 			// !blocks[i]->is_dummy
-			// TODO: why this check?
 			if (blocks[i]->is_dummy.bits == NULL) {
 				blocks[i]->is_dummy = __obliv_c__newBool();
 				__obliv_c__genOblivBool(blocks[i]->is_dummy, false);
@@ -137,7 +136,6 @@ void bucket_read_and_remove(__obliv_c__bool cond, Block** blocks, int bucket_siz
 			// blocks[i]->index == index
 			__obliv_c__bool tmp2 = __obliv_c__newBool();
 			__obliv_c__genOblivBool(tmp2, false);
-			// TODO: why this check?
 			if (blocks[i]->index.bits == NULL) {
 				blocks[i]->index = __obliv_c__newInt();
 				__obliv_c__genOblivInt(blocks[i]->index, 0);
@@ -249,8 +247,8 @@ void nro_put_back(__obliv_c__bool cond, NonRecursiveOram * oram,
     ocCopy(cond,oram->cpy,des->data,data);
 	bucket_add(cond, oram->stash, oram->stash_size, des, oram->cpy);
 	block_release(cond, des);  
-	// nro_flush(cond, oram);
-	// nro_flush(cond, oram);
+	nro_flush(cond, oram);
+	nro_flush(cond, oram);
 }
 
 void get_path(__obliv_c__bool cond, NonRecursiveOram* oram, int position_label) // obliv 

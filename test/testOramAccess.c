@@ -63,8 +63,8 @@ void testOramAccess()
     #endif
 
     ocOramRelease(ram);
-    // _mm_free(indices);
-    // _mm_free(content);
+    _mm_free(indices);
+    _mm_free(content);
 }
 
 int main(int argc, char ** argv) 

@@ -36,9 +36,9 @@ void decoderEn(__obliv_c__bool* dest, __obliv_c__bool en,
 void ocLinearOramRelease(OcOram* super) 
 { 
     OcLinearOram* ram = (OcLinearOram*) super; // CAST(super);
-    // _mm_free(ram->data);
-    // _mm_free(ram->flags);
-    // _mm_free(ram);
+    _mm_free(ram->data);
+    _mm_free(ram->flags);
+    _mm_free(ram);
 }
 
 void ocLinearOramAccess(__obliv_c__bool cond, OcOram* super, __obliv_c__int index, OcOramAccessCb f, void* arg) // obliv
@@ -51,7 +51,7 @@ void ocLinearOramAccess(__obliv_c__bool cond, OcOram* super, __obliv_c__int inde
     for (int i = 0; i < super->n; ++i) {
         // obliv if (ram->flags[i])
             __obliv_c__bool cond_res = __obliv_c__newBool();
-            __obliv_c__boolAnd(cond_res, ram->flags[i], cond); // TODO: Check that this AND has to happen
+            __obliv_c__boolAnd(cond_res, ram->flags[i], cond);
             f(cond_res, super, ocCopyElt(cond_res, super->cpy, ram->data, i), arg);
         // }
     }

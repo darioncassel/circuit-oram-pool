@@ -66,11 +66,11 @@ void ckt_release(OcOram* super) {
 		nro_release(oram->orams[i]);
 	}
 	ocOramRelease(oram->base);
-	// _mm_free(oram->poscpy);
-	// _mm_free(oram->orams);
+	_mm_free(oram->poscpy);
+	_mm_free(oram->orams);
 	// releaseBCipherRandomGen(oram->gen);
-	// _mm_free(oram->rand_pool);
-	// _mm_free(oram);
+	_mm_free(oram->rand_pool);
+	_mm_free(oram);
 }
 
 void ckt_read(__obliv_c__bool cond, CircuitOram* oram, __obliv_c__int index, void* data) // obliv 
@@ -100,11 +100,11 @@ void ckt_apply(__obliv_c__bool cond, OcOram* super, __obliv_c__int index, OcOram
 
 	update_trees(cond, oram, index, 1, &pos, &new_pos);
 
-    /*void *data = calloc_obliv(cond, 1, super->cpy->eltsize);
+    void *data = calloc_obliv(cond, 1, super->cpy->eltsize);
 	nro_read_and_remove(cond, oram->orams[0], index, pos, data);
-	func(cond, super, data, ext_data);
+	// func(cond, super, data, ext_data);
 	nro_put_back(cond, oram->orams[0], index, new_pos, data);
-	free_obliv(cond, data);*/
+	free_obliv(cond, data);
 }
 
 void ckt_write(__obliv_c__bool cond, CircuitOram* oram, __obliv_c__int index, void* data) // obliv
@@ -200,7 +200,7 @@ void extract_bits(__obliv_c__bool cond, __obliv_c__bool* data_chunk, __obliv_c__
 				__obliv_c__bool tmp2 = __obliv_c__newBool();
 				__obliv_c__genOblivBool(tmp2, false);
 				// TODO: Fix this
-				// *tmp2.bits = data_chunk->bits[i*entry_size + j];
+				// __obliv_c__copyBit(tmp2.bits, &data_chunk->bits[i*entry_size + j]);
 				__obliv_c__boolCondAssign(cond_res, res[j], tmp2);
 			}
 		// }
@@ -228,41 +228,30 @@ void put_bits(__obliv_c__bool cond, __obliv_c__bool* data_chunk, __obliv_c__int 
 	}
 }
 
-void get_rand_obliv(__obliv_c__bool cond, /*BCipherRandomGen*/void* gen, __obliv_c__bool * data, int len) // obliv
+void get_rand_obliv(__obliv_c__bool cond, void* gen, __obliv_c__bool * data, int len) // obliv
 {
    // ~obliv(){
       bool* rand_bool = _mm_malloc(len * sizeof(bool), 32);
-      // OblivInputs* specs = _mm_malloc(sizeof(OblivInputs) * len);
-      // OblivInputs* specs2 = _mm_malloc(sizeof(OblivInputs) * len);
       __obliv_c__bool* data1 = _mm_malloc(sizeof(__obliv_c__bool) * len, 32);
 	  
-	  //***************************************************************
-	  // TODO: Fix this code
+	  // TODO: Improve this code
 	  for(int i = 0; i < len; ++i) {
 		  __obliv_c__bool tmp0 = __obliv_c__newBool();
-		  __obliv_c__genOblivBool(tmp0, true);
+		  __obliv_c__genOblivBool(tmp0, rand() & 1);
 		  data[i] = tmp0;
 	  }
 	  for(int i = 0; i < len; ++i) {
 		  __obliv_c__bool tmp0 = __obliv_c__newBool();
-		  __obliv_c__genOblivBool(tmp0, false);
+		  __obliv_c__genOblivBool(tmp0, rand() & 1);
 		  data1[i] = tmp0;
 	  }
-	  //***************************************************************
 	  
       // randomizeBuffer(gen, rand_bool, len);
-      /*for(int i = 0; i < len; ++i) {
-         rand_bool[i] =( (rand_bool[i]) % 2 == 0);
-         setupOblivBool(&specs[i], &data[i], rand_bool[i]);
-         setupOblivBool(&specs2[i], &data1[i], rand_bool[i]);
-      }
-      feedOblivInputs(specs, len, 1);
-      feedOblivInputs(specs2, len, 2);*/
-      for(int i = 0; i < len; ++i)
+      for(int i = 0; i < len; ++i) {
          __obliv_c__boolXor(data[i], data[i], data1[i]);
-      // _mm_free(rand_bool);
-      /*// _mm_free(specs);
-      // _mm_free(specs2);
-      // _mm_free(data1);*/
+	  }
+
+      _mm_free(rand_bool);
+      _mm_free(data1);
    // }
 }

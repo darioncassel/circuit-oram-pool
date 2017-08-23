@@ -19,7 +19,6 @@ void bool_to_int_obliv(__obliv_c__bool cond, __obliv_c__bool *bools, __obliv_c__
             // *res = (*res ^ (bools[i]));
             __obliv_c__int tmp2 = __obliv_c__newInt();
             __obliv_c__genOblivInt(tmp2, 0);
-            // TODO: Check this
             if (bools[i].bits == NULL) {
                 bools[i] = __obliv_c__newBool();
                 __obliv_c__genOblivBool(bools[i], false);
