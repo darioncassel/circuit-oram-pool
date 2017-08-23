@@ -98,10 +98,10 @@ void nro_release(NonRecursiveOram* oram) {
 
 Block*** path_initialize(__obliv_c__bool cond, NonRecursiveOram* oram) // obliv
 {
-	Block*** path = calloc_obliv(cond, sizeof(Block**), oram->index_size + 1);
-	path[0] = calloc_obliv(cond, sizeof(Block*), oram->stash_size);
+	Block*** path = calloc_obliv(cond, oram->index_size + 1, sizeof(Block**));
+	path[0] = calloc_obliv(cond, oram->stash_size, sizeof(Block*));
 	for(int i = 0; i < oram->index_size; ++i) {
-		path[i + 1] = calloc_obliv(cond, sizeof(Block*), oram->bucket_size);
+		path[i + 1] = calloc_obliv(cond, oram->bucket_size, sizeof(Block*));
 	}
 	return path;
 }
@@ -375,9 +375,10 @@ void path_oram_flush(__obliv_c__bool cond, NonRecursiveOram * oram, int path_val
 
 void circuit_oram_flush(__obliv_c__bool cond, NonRecursiveOram * oram, int path_val) // obliv
 {
-	for (int i = 0; i <= oram->index_size; ++i) {	
+	for (int itr = 0; itr <= oram->index_size; ++itr) {
 		int cap = oram->bucket_size;
-		if (i == 0)
+		int i = 0/*itr*/;
+		if (itr == 0)
 			cap = oram->stash_size;
 		// oram->deepest_index[i] = -1;
 		__obliv_c__int tmp0 = __obliv_c__newInt();
@@ -390,22 +391,41 @@ void circuit_oram_flush(__obliv_c__bool cond, NonRecursiveOram * oram, int path_
 		for(int j = 0; j < cap; ++j) {
 			// obliv block_depth = compute_depth(oram->path[i][j]->position_label, path_val, oram->index_size);
 			__obliv_c__int block_depth = __obliv_c__newInt();
+			__obliv_c__genOblivInt(block_depth, 0);
 			__obliv_c__int tmp2 = __obliv_c__newInt();
+			__obliv_c__genOblivInt(tmp2, 0);
 			__obliv_c__int tmp_int4 = __obliv_c__newInt();
 			__obliv_c__genOblivInt(tmp_int4, path_val);
-			/*tmp2 = compute_depth(cond, oram->path[i][j]->position_label, tmp_int4, oram->index_size);
+			if (oram->path[i][j]->position_label.bits == NULL) {
+				oram->path[i][j]->position_label = __obliv_c__newInt();
+				__obliv_c__genOblivInt(oram->path[i][j]->position_label, 0);
+			}
+			tmp2 = compute_depth(cond, oram->path[i][j]->position_label, tmp_int4, oram->index_size);
 			__obliv_c__intCondAssign(cond, block_depth, tmp2);
 			// obliv if (block_depth > oram->deepest_depth[i] & !oram->path[i][j]->is_dummy) {
 				__obliv_c__bool cond_res = __obliv_c__newBool();
+				__obliv_c__genOblivBool(cond_res, false);
 				// !oram->path[i][j]->is_dummy
 				__obliv_c__bool tmp3 = __obliv_c__newBool();
+				__obliv_c__genOblivBool(tmp3, false);
+				if (oram->path[i][j]->is_dummy.bits == NULL) {
+					oram->path[i][j]->is_dummy = __obliv_c__newBool();
+					__obliv_c__genOblivBool(oram->path[i][j]->is_dummy, false);
+				}
 				__obliv_c__copyBit(tmp3.bits, oram->path[i][j]->is_dummy.bits);
 				__obliv_c__flipBit(tmp3.bits);
 				// block_depth > oram->deepest_depth[i]
 				__obliv_c__bool tmp4 = __obliv_c__newBool();
-				__obliv_c__intGr(tmp4, block_depth, oram->deepest_depth[i]);
+				__obliv_c__genOblivBool(tmp4, false);
+				if (oram->deepest_depth[i].bits == NULL) {
+					oram->deepest_depth[i] = __obliv_c__newInt();
+					__obliv_c__genOblivInt(oram->deepest_depth[i], 0);
+				}
+				// TODO: fix this
+				// __obliv_c__intGr(tmp4, block_depth, oram->deepest_depth[i]);
 				// block_depth > oram->deepest_depth[i] & !oram->path[i][j]->is_dummy
 				__obliv_c__bool tmp5 = __obliv_c__newBool();
+				__obliv_c__genOblivBool(tmp5, false);
 				__obliv_c__boolAnd(tmp5, tmp4, tmp3);
 
 				__obliv_c__boolAnd(cond_res, cond, tmp5);
@@ -416,7 +436,7 @@ void circuit_oram_flush(__obliv_c__bool cond, NonRecursiveOram * oram, int path_
 				__obliv_c__int tmp6 = __obliv_c__newInt();
 				__obliv_c__genOblivInt(tmp6, j);
 				__obliv_c__intCondAssign(cond_res, oram->deepest_index[i], tmp6);
-			// }*/
+			// }
 		}
 	}
 	/*~obliv(){
@@ -430,7 +450,7 @@ void circuit_oram_flush(__obliv_c__bool cond, NonRecursiveOram * oram, int path_
 	  }*/
 
 	//prepare deepest
-	/*for (int i = 0; i < oram->index_size+1; ++i) {
+	for (int i = 0; i < oram->index_size+1; ++i) {
 		// oram->deepest[i] = oram->target[i] = -1;
 		__obliv_c__int tmp7 = __obliv_c__newInt();
 		__obliv_c__genOblivInt(tmp7, -1);
@@ -440,29 +460,35 @@ void circuit_oram_flush(__obliv_c__bool cond, NonRecursiveOram * oram, int path_
 
 	// obliv int src = -1;
 	__obliv_c__int src = __obliv_c__newInt();
+	__obliv_c__genOblivInt(src, 0);
 	__obliv_c__int tmp8 = __obliv_c__newInt();
 	__obliv_c__genOblivInt(tmp8, -1);
 	__obliv_c__intCondAssign(cond, src, tmp8);
 	// obliv int goal = -1;
 	__obliv_c__int goal = __obliv_c__newInt();
+	__obliv_c__genOblivInt(goal, 0);
 	__obliv_c__int tmp9 = __obliv_c__newInt();
 	__obliv_c__genOblivInt(tmp9, -1);
 	__obliv_c__intCondAssign(cond, goal, tmp9);
 	// obliv bool is_stash_empty = true;
 	__obliv_c__bool is_stash_empty = __obliv_c__newBool();
+	__obliv_c__genOblivBool(is_stash_empty, false);
 	__obliv_c__bool tmp10 = __obliv_c__newBool();
-	__obliv_c__genOblivBool(tmp10, true);
+	__obliv_c__genOblivBool(tmp10, false);
 	__obliv_c__boolCondAssign(cond, is_stash_empty, tmp10);
 
 	for(int i = 0; i < oram->stash_size; ++i) {
 		// is_stash_empty = is_stash_empty & oram->stash[i]->is_dummy; 
 		__obliv_c__bool tmp11 = __obliv_c__newBool();
+		__obliv_c__genOblivBool(tmp11, false);
 		__obliv_c__boolAnd(tmp11, is_stash_empty, oram->stash[i]->is_dummy);
 		__obliv_c__boolCondAssign(cond, is_stash_empty, tmp11);
 	}
 	// obliv if (!is_stash_empty) {
 		__obliv_c__bool cond_res = __obliv_c__newBool();
+		__obliv_c__genOblivBool(cond_res, false);
 		__obliv_c__bool tmp12 = __obliv_c__newBool();
+		__obliv_c__genOblivBool(tmp12, false);
 		__obliv_c__copyBit(tmp12.bits, is_stash_empty.bits);
 		__obliv_c__flipBit(tmp12.bits);
 		__obliv_c__boolAnd(cond_res, cond, tmp12);
@@ -478,20 +504,25 @@ void circuit_oram_flush(__obliv_c__bool cond, NonRecursiveOram * oram, int path_
 	for(int i = 1; i <= oram->index_size; ++i) {
 		// obliv if (goal >= i)
 			__obliv_c__bool cond_res2 = __obliv_c__newBool();
+			__obliv_c__genOblivBool(cond_res2, false);
 			__obliv_c__int tmp14 = __obliv_c__newInt();
 			__obliv_c__genOblivInt(tmp14, i);
 			__obliv_c__bool tmp15 = __obliv_c__newBool();
-			__obliv_c__intGrEq(tmp15, goal, tmp14);
+			__obliv_c__genOblivBool(tmp15, false);
+			// __obliv_c__intGrEq(tmp15, goal, tmp14);
 			__obliv_c__boolAnd(cond_res2, cond, tmp15);
 			// oram->deepest[i] = src;
 			__obliv_c__intCondAssign(cond_res2, oram->deepest[i], src);
 			// obliv int l = oram->deepest_depth[i];
 			__obliv_c__int l = __obliv_c__newInt();
+			__obliv_c__genOblivInt(l, 0);
 			__obliv_c__intCondAssign(cond, l, oram->deepest_depth[i]);
 			// obliv if (l > goal) {
 			__obliv_c__bool cond_res3 = __obliv_c__newBool();
+			__obliv_c__genOblivBool(cond_res3, false);
 			__obliv_c__bool tmp16 = __obliv_c__newBool();
-			__obliv_c__intGr(tmp16, l, goal);
+			__obliv_c__genOblivBool(tmp16, false);
+			// __obliv_c__intGr(tmp16, l, goal);
 			__obliv_c__boolAnd(cond_res3, cond, tmp16);
 			// goal = l;
 			__obliv_c__intCondAssign(cond_res3, goal, l);
@@ -500,7 +531,7 @@ void circuit_oram_flush(__obliv_c__bool cond, NonRecursiveOram * oram, int path_
 			__obliv_c__genOblivInt(tmp_int3, i);
 			__obliv_c__intCondAssign(cond_res3, src, tmp_int3);
 		// }
-	}*/
+	}
 
 	/*~obliv(){
 	  for (int i = 0; i < oram->index_size; ++i) {
@@ -512,7 +543,8 @@ void circuit_oram_flush(__obliv_c__bool cond, NonRecursiveOram * oram, int path_
 
 	//prepare target
 	// obliv int dest = -1;
-	/*__obliv_c__int dest = __obliv_c__newInt();
+	__obliv_c__int dest = __obliv_c__newInt();
+	__obliv_c__genOblivInt(dest, 0);
 	__obliv_c__int tmp17 = __obliv_c__newInt();
 	__obliv_c__genOblivInt(tmp17, -1);
 	__obliv_c__intCondAssign(cond, dest, tmp17);
@@ -524,9 +556,11 @@ void circuit_oram_flush(__obliv_c__bool cond, NonRecursiveOram * oram, int path_
 	for(int i = oram->index_size; i >= 0; --i) {
 		// obliv if (i == src) {
 			__obliv_c__bool cond_res4 = __obliv_c__newBool();
+			__obliv_c__genOblivBool(cond_res4, false);
 			__obliv_c__int tmp19 = __obliv_c__newInt();
 			__obliv_c__genOblivInt(tmp19, i);
 			__obliv_c__bool tmp20 = __obliv_c__newBool();
+			__obliv_c__genOblivBool(tmp20, false);
 			__obliv_c__intEqual(tmp20, tmp19, src);
 			// oram->target[i] = dest;
 			__obliv_c__intCondAssign(cond_res4, oram->target[i], dest);
@@ -542,6 +576,7 @@ void circuit_oram_flush(__obliv_c__bool cond, NonRecursiveOram * oram, int path_
 
 		// obliv bool not_full = false;
 		__obliv_c__bool not_full = __obliv_c__newBool();
+		__obliv_c__genOblivBool(not_full, false);
 		__obliv_c__bool tmp23 = __obliv_c__newBool();
 		__obliv_c__genOblivBool(tmp23, false);
 		__obliv_c__boolCondAssign(cond, not_full, tmp23);
@@ -552,36 +587,52 @@ void circuit_oram_flush(__obliv_c__bool cond, NonRecursiveOram * oram, int path_
 		for (int j = 0; j < cap; ++j) {
 			// not_full = not_full | oram->path[i][j]->is_dummy;
 			__obliv_c__bool tmp24 = __obliv_c__newBool();
-			__obliv_c__boolOr(tmp24, not_full, oram->path[i][j]->is_dummy);
+			__obliv_c__genOblivBool(tmp24, false);
+			// __obliv_c__boolOr(tmp24, not_full, oram->path[i][j]->is_dummy);
 			__obliv_c__boolCondAssign(cond, not_full, tmp24);
 		}
 		// obliv if ( ((dest == -1 & not_full ) | oram->target[i] != -1 ) & oram->deepest[i] != -1) {
 			__obliv_c__bool cond_res5 = __obliv_c__newBool();
+			__obliv_c__genOblivBool(cond_res5, false);
 			// oram->deepest[i] != -1
 			__obliv_c__int tmp25 = __obliv_c__newInt();
 			__obliv_c__genOblivInt(tmp25, -1);
 			__obliv_c__bool tmp26 = __obliv_c__newBool();
+			__obliv_c__genOblivBool(tmp26, false);
+			if (oram->deepest[i].bits == NULL) {
+				oram->deepest[i] = __obliv_c__newInt();
+				__obliv_c__genOblivInt(oram->deepest[i], 0);
+			}
 			__obliv_c__intEqual(tmp26, oram->deepest[i], tmp25);
 			__obliv_c__flipBit(tmp26.bits);
 			// oram->target[i] != -1
 			__obliv_c__int tmp27 = __obliv_c__newInt();
 			__obliv_c__genOblivInt(tmp27, -1);
 			__obliv_c__bool tmp28 = __obliv_c__newBool();
+			__obliv_c__genOblivBool(tmp28, false);
+			if (oram->target[i].bits == NULL) {
+				oram->target[i] = __obliv_c__newInt();
+				__obliv_c__genOblivInt(oram->target[i], 0);
+			}
 			__obliv_c__intEqual(tmp28, oram->target[i], tmp27);
 			__obliv_c__flipBit(tmp28.bits);
 			// dest == -1
 			__obliv_c__int tmp29 = __obliv_c__newInt();
 			__obliv_c__genOblivInt(tmp29, -1);
 			__obliv_c__bool tmp30 = __obliv_c__newBool();
+			__obliv_c__genOblivBool(tmp30, false);
 			__obliv_c__intEqual(tmp30, dest, tmp29);
 			// dest == -1 & not_full
 			__obliv_c__bool tmp31 = __obliv_c__newBool();
+			__obliv_c__genOblivBool(tmp31, false);
 			__obliv_c__boolAnd(tmp31, tmp30, not_full);
 			// (dest == -1 & not_full ) | oram->target[i] != -1)
 			__obliv_c__bool tmp32 = __obliv_c__newBool();
-			__obliv_c__boolOr(tmp32, tmp31, tmp28);
+			__obliv_c__genOblivBool(tmp32, false);
+			// __obliv_c__boolOr(tmp32, tmp31, tmp28);
 			// (dest == -1 & not_full ) | oram->target[i] != -1) & oram->deepest[i] != -1)
 			__obliv_c__bool tmp33 = __obliv_c__newBool();
+			__obliv_c__genOblivBool(tmp33, false);
 			__obliv_c__boolAnd(tmp33, tmp32, tmp26);
 			// obliv if
 			__obliv_c__boolAnd(cond_res5, cond, tmp33);
@@ -592,7 +643,7 @@ void circuit_oram_flush(__obliv_c__bool cond, NonRecursiveOram * oram, int path_
 			__obliv_c__genOblivInt(tmp34, i);
 			__obliv_c__intCondAssign(cond_res5, dest, tmp34);
 		// }
-	}*/
+	}
 	/*~obliv(){
 	  for (int i = 0; i < oram->index_size; ++i) {
 	  int tmp;
@@ -602,16 +653,18 @@ void circuit_oram_flush(__obliv_c__bool cond, NonRecursiveOram * oram, int path_
 	  printf("===============\n");
 	  }*/
 
-	/*__obliv_c__int tmp_int1 = __obliv_c__newInt();
+	__obliv_c__int tmp_int1 = __obliv_c__newInt();
 	__obliv_c__genOblivInt(tmp_int1, -1);
-	dest = tmp_int1;
+	// dest = tmp_int1;
 	// obliv int to_write_depth = 0;
 	__obliv_c__int to_write_depth = __obliv_c__newInt();
+	__obliv_c__genOblivInt(to_write_depth, 0);
 	__obliv_c__int tmp35 = __obliv_c__newInt();
 	__obliv_c__genOblivInt(tmp35, 0);
 	__obliv_c__intCondAssign(cond, to_write_depth, tmp35);
 	// obliv int hold_depth = 0;
 	__obliv_c__int hold_depth = __obliv_c__newInt();
+	__obliv_c__genOblivInt(hold_depth, 0);
 	__obliv_c__int tmp36 = __obliv_c__newInt();
 	__obliv_c__genOblivInt(tmp36, 0);
 	__obliv_c__intCondAssign(cond, hold_depth, tmp36);
@@ -624,17 +677,25 @@ void circuit_oram_flush(__obliv_c__bool cond, NonRecursiveOram * oram, int path_
 		
 		// obliv if (!oram->hold->is_dummy & i == dest) {
 			__obliv_c__bool cond_res6 = __obliv_c__newBool();
+			__obliv_c__genOblivBool(cond_res6, true);
 			// i == dest
 			__obliv_c__bool tmp38 = __obliv_c__newBool();
+			__obliv_c__genOblivBool(tmp38, true);
 			__obliv_c__int tmp_int0 = __obliv_c__newInt();
 			__obliv_c__genOblivInt(tmp_int0, i);
 			__obliv_c__intEqual(tmp38, tmp_int0, dest);
 			// !oram->hold->is_dummy
 			__obliv_c__bool tmp39 = __obliv_c__newBool();
+			__obliv_c__genOblivBool(tmp39, true);
+			if (oram->hold->is_dummy.bits == NULL) {
+				oram->hold->is_dummy = __obliv_c__newBool();
+				__obliv_c__genOblivBool(oram->hold->is_dummy, false);
+			}
 			__obliv_c__copyBit(tmp39.bits, oram->hold->is_dummy.bits);
 			__obliv_c__flipBit(tmp39.bits);
 			// !oram->hold->is_dummy & i == dest
 			__obliv_c__bool tmp40 = __obliv_c__newBool();
+			__obliv_c__genOblivBool(tmp40, true);
 			__obliv_c__boolAnd(tmp40, tmp39, tmp38);
 			// obliv if
 			__obliv_c__boolAnd(cond_res6, cond, tmp40);
@@ -655,10 +716,12 @@ void circuit_oram_flush(__obliv_c__bool cond, NonRecursiveOram * oram, int path_
 		if (i == 0) cap = oram->stash_size;
 		// obliv if(oram->target[i] != -1) {
 			__obliv_c__bool cond_res7 = __obliv_c__newBool();
+			__obliv_c__genOblivBool(cond_res7, true);
 			// oram->target[i] != -1
 			__obliv_c__int tmp43 = __obliv_c__newInt();
 			__obliv_c__genOblivInt(tmp43, -1);
 			__obliv_c__bool tmp44 = __obliv_c__newBool();
+			__obliv_c__genOblivBool(tmp44, true);
 			__obliv_c__intEqual(tmp44, oram->target[i], tmp43);
 			__obliv_c__flipBit(tmp44.bits);
 			// obliv if
@@ -666,13 +729,22 @@ void circuit_oram_flush(__obliv_c__bool cond, NonRecursiveOram * oram, int path_
 			for(int j = 0; j < cap; ++j) {
 				// obliv if (oram->deepest_index[i] == j) {
 					__obliv_c__bool cond_res8 = __obliv_c__newBool();
+					__obliv_c__genOblivBool(cond_res8, true);
 					// oram->deepest_index[i] == j
 					__obliv_c__int tmp45 = __obliv_c__newInt();
 					__obliv_c__genOblivInt(tmp45, j);
 					__obliv_c__bool tmp46 = __obliv_c__newBool();
+					__obliv_c__genOblivBool(tmp46, true);
+					if (oram->deepest_index[i].bits == NULL) {
+						oram->deepest_index[i] = __obliv_c__newInt();
+						__obliv_c__genOblivInt(oram->deepest_index[i], 0);
+					}
 					__obliv_c__intEqual(tmp46, oram->deepest_index[i], tmp45);
 					// obliv if
 					__obliv_c__boolAnd(cond_res8, cond_res7, tmp46);
+					if (oram->path[i][j] == NULL) {
+						oram->path[i][j] = block_initialize(cond_res8, oram->cpy);
+					}
 					block_copy(cond_res8, oram->path[i][j], oram->hold, oram->cpy);
 					// oram->path[i][j]->is_dummy = true;
 					__obliv_c__bool tmp47 = __obliv_c__newBool();
@@ -688,13 +760,20 @@ void circuit_oram_flush(__obliv_c__bool cond, NonRecursiveOram * oram, int path_
 
 		// obliv bool added = false;
 		__obliv_c__bool added = __obliv_c__newBool();
+		__obliv_c__genOblivBool(added, false);
 		__obliv_c__bool tmp48 = __obliv_c__newBool();
 		__obliv_c__genOblivBool(tmp48, false);
 		__obliv_c__boolCondAssign(cond, added, tmp48);
 		// obliv if (!oram->to_write->is_dummy) {
 			__obliv_c__bool cond_res9 = __obliv_c__newBool();
+			__obliv_c__genOblivBool(cond_res9, false);
 			// !oram->to_write->is_dummy
 			__obliv_c__bool tmp49 = __obliv_c__newBool();
+			__obliv_c__genOblivBool(tmp49, false);
+			if (oram->to_write->is_dummy.bits == NULL) {
+				oram->to_write->is_dummy = __obliv_c__newBool();
+				__obliv_c__genOblivBool(oram->to_write->is_dummy, false);
+			}
 			__obliv_c__copyBit(tmp49.bits, oram->to_write->is_dummy.bits);
 			__obliv_c__flipBit(tmp49.bits);
 			// obliv if
@@ -702,12 +781,19 @@ void circuit_oram_flush(__obliv_c__bool cond, NonRecursiveOram * oram, int path_
 			for(int j = 0; j < cap; ++j) {
 				// obliv if (oram->path[i][j]->is_dummy & !added) {
 					__obliv_c__bool cond_res10 = __obliv_c__newBool();
+					__obliv_c__genOblivBool(cond_res10, false);
 					// !added
 					__obliv_c__bool tmp50 = __obliv_c__newBool();
+					__obliv_c__genOblivBool(tmp50, false);
 					__obliv_c__copyBit(tmp50.bits, added.bits);
 					__obliv_c__flipBit(tmp50.bits);
 					// oram->path[i][j]->is_dummy & !added
 					__obliv_c__bool tmp51 = __obliv_c__newBool();
+					__obliv_c__genOblivBool(tmp51, false);
+					if (oram->path[i][j]->is_dummy.bits == NULL) {
+						 oram->path[i][j]->is_dummy = __obliv_c__newBool();
+						 __obliv_c__genOblivBool(oram->path[i][j]->is_dummy, false);
+					}
 					__obliv_c__boolAnd(tmp51, oram->path[i][j]->is_dummy, tmp50);
 					// obliv if
 					__obliv_c__boolAnd(cond_res10, cond_res9, tmp51);
@@ -718,9 +804,11 @@ void circuit_oram_flush(__obliv_c__bool cond, NonRecursiveOram * oram, int path_
 					__obliv_c__boolCondAssign(cond_res10, added, tmp52);
 					// obliv if (to_write_depth > oram->deepest_depth[i]) {
 						__obliv_c__bool cond_res11 = __obliv_c__newBool();
+						__obliv_c__genOblivBool(cond_res11, false);
 						// to_write_depth > oram->deepest_depth[i]
 						__obliv_c__bool tmp53 = __obliv_c__newBool();
-						__obliv_c__intGr(tmp53, to_write_depth, oram->deepest_depth[i]);
+						__obliv_c__genOblivBool(tmp53, false);
+						// __obliv_c__intGr(tmp53, to_write_depth, oram->deepest_depth[i]);
 						// obliv if
 						__obliv_c__boolAnd(cond_res11, cond_res10, tmp53);
 						// oram->deepest_depth[i] = to_write_depth;
@@ -733,5 +821,5 @@ void circuit_oram_flush(__obliv_c__bool cond, NonRecursiveOram * oram, int path_
 				// }
 			}
 		// }
-	}*/
+	}
 }
