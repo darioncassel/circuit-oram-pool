@@ -10,7 +10,7 @@ Path=Pool/ZH128
 CommonPath=$(Path)/Common
 GarbPath=$(Path)/Garb
 EvalPath=$(Path)/Eval
-CFLAGS= -w -I $(CommonPath) -march=native -o AESG.out `libgcrypt-config --cflags --libs`  -lm -O3 -D DEBUG_METRICS_ON -D MAC
+CFLAGS= -w -I $(CommonPath) -march=native `libgcrypt-config --cflags --libs`  -lm -O3 -D DEBUG_METRICS_ON -D MAC -D Set1
 CFLAGG=$(CFLAGS) -I $(GarbPath) -D POOL_GARB
 CFLAGE=$(CFLAGS) -I $(EvalPath) -D POOL_EVAL
 
@@ -18,8 +18,8 @@ ZHFileC=$(CommonPath)/cmmc.c  $(CommonPath)/RandomMatrix.c  $(CommonPath)/galois
 ZHFileG=$(GarbPath)/BatchBucketProcess.c $(GarbPath)/server.c $(GarbPath)/iHash.c $(GarbPath)/GateGeneration.c $(GarbPath)/BucketProcess.c $(GarbPath)/CircuitBuild.c $(GarbPath)/BatchGateGeneration.c $(GarbPath)/InputProcess.c
 ZHFileE=$(EvalPath)/BatchBucketProcess.c $(EvalPath)/client.c $(EvalPath)/iHash.c $(EvalPath)/GateGeneration.c $(EvalPath)/BucketProcess.c $(EvalPath)/CircuitBuild.c $(EvalPath)/BatchGateGeneration.c $(EvalPath)/InputProcess.c
 
-PoolFileG= Pool/PoolCode/Garb/PoolAnd.c Pool/PoolCode/Garb/PoolAnd.h Pool/PoolCode/Garb/Functions.c Pool/PoolCode/Garb/Functions.h
-PoolFileE= Pool/PoolCode/Eval/PoolAnd.c Pool/PoolCode/Eval/PoolAnd.h Pool/PoolCode/Eval/Functions.c Pool/PoolCode/Eval/Functions.h
+PoolFileG= Pool/PoolCode/Garb/PoolAnd.c Pool/PoolCode/Garb/PoolAnd.h Pool/PoolCode/Garb/Functions.c Pool/PoolCode/Garb/Functions.h Pool/PoolCode/Garb/PoolMux.c Pool/PoolCode/Garb/PoolMux.h Pool/PoolCode/Garb/Gadgets.c Pool/PoolCode/Garb/Gadgets.h Pool/PoolCode/Garb/BucketGadgets.c Pool/PoolCode/Garb/BucketGadgets.h
+PoolFileE= Pool/PoolCode/Eval/PoolAnd.c Pool/PoolCode/Eval/PoolAnd.h Pool/PoolCode/Eval/Functions.c Pool/PoolCode/Eval/Functions.h Pool/PoolCode/Eval/PoolMux.c Pool/PoolCode/Eval/PoolMux.h Pool/PoolCode/Eval/Gadgets.c Pool/PoolCode/Eval/Gadgets.h Pool/PoolCode/Eval/BucketGadgets.c Pool/PoolCode/Eval/BucketGadgets.h
 
 OblivFiles = obliv/obliv.c obliv/obliv_gates.c oram/block.c oram/circuit_oram.c oram/copy.c oram/linear_oram.c oram/nonrecursive_oram.c oram/oram.c
 

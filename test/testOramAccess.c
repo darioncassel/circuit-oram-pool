@@ -16,6 +16,7 @@ void testOramAccess()
 {
     CircuitSetup(2, 1, 3);
     PoolSetup();
+    OramMCPoolSetup(32);
 
     int n = 1000000;
     int size = 1;

@@ -6,10 +6,12 @@
 #ifdef POOL_EVAL
     #include "../Pool/ZH128/Eval/InputProcess.h"
     #include "../Pool/ZH128/Eval/CircuitBuild.h"
+    #include "../Pool/PoolCode/Eval/PoolMux.h"
 #endif
 #ifdef POOL_GARB
     #include "../Pool/ZH128/Garb/InputProcess.h"
     #include "../Pool/ZH128/Garb/CircuitBuild.h"
+    #include "../Pool/PoolCode/Garb/PoolMux.h"
 #endif
 
 #define bool int
