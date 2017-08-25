@@ -57,7 +57,7 @@ CircuitOram* ckt_initialize_more_param(int N, OcCopy* cpy, int recursion_factor,
 
 CircuitOram* ckt_initialize(int N, OcCopy* cpy) 
 {
-	return ckt_initialize_more_param(N, cpy, 8, 1<<8);
+	return ckt_initialize_more_param(N, cpy, 8, 1<<RECURSION_SCALE);
 }
 
 void ckt_release(OcOram* super) {

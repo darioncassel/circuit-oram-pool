@@ -17,10 +17,10 @@ void testOramAccess()
     CircuitSetup(2, 1, 3);
     PoolSetup();
 
-    int n = 258;
+    int n = RAM_SIZE;
     int size = 1;
     
-    #ifdef DATA_1024
+    #ifdef Set2
         typedef struct {
             __obliv_c__int data[32];
         } data_1024;
@@ -35,7 +35,7 @@ void testOramAccess()
 
     // Seed content
     for (int i = 0; i < n; i++) {
-        #ifdef DATA_1024
+        #ifdef Set2
             data_1024 tmp0;
             for (int j = 0; j < 32; j++) {
                 __obliv_c__int tmp1 = __obliv_c__newInt();
@@ -58,6 +58,7 @@ void testOramAccess()
 
     // Initialize Circuit Oram
     OcOram *ram = (OcOram*) ckt_initialize(n, &ocCopyInt);
+    printf("Num recur: %d\n", ((CircuitOram*)ram)->num_recursion-1);
     __obliv_c__bool cond = __obliv_c__newBool();
     __obliv_c__genOblivBool(cond, true);
 
@@ -69,7 +70,7 @@ void testOramAccess()
         ocOramWrite(cond, ram, tmp2, content + i);
     }*/
 
-    #ifdef DATA_1024
+    #ifdef Set2
         data_1024 output;
         for (int j = 0; j < 32; j++) {
             __obliv_c__int tmp1 = __obliv_c__newInt();
@@ -87,7 +88,7 @@ void testOramAccess()
     unsigned long long b0, b1 = 0; b0 = b1;
     b0 = inByte + outByte;
     #ifndef MAC
-        t0 = WallClock();
+        t0 = wallClock();
     #endif
 
     // Read from ram
@@ -98,7 +99,7 @@ void testOramAccess()
     }
 
     #ifndef MAC
-        t1 = WallClock();
+        t1 = wallClock();
     #endif
     b1 = inByte + outByte;
     printf("time = %lf\n", (t1 - t0) * 1.0 / 1000000);
