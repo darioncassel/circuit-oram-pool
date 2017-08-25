@@ -556,29 +556,36 @@ void __obliv_c__ifThenElse(void* vdest, const void* vtsrc
     const OblivBit *tsrc = vtsrc, *fsrc = vfsrc;
     if (size == 32) {
         #ifdef POOL_GARB
-        Wire diff[32],dst[32],choice;
-        choice=c.pool.w;
-        int i;
-        for(i=0;i<32;i++)
-            diff[i]=XorGate(tsrc[i].pool.w,fsrc[i].pool.w);
+            Wire diff[32],dst[32],choice;
+            choice=c.pool.w;
+            int i;
+            for(i=0;i<32;i++)
+                diff[i]=XorGate(tsrc[i].pool.w,fsrc[i].pool.w);
         #endif
         #ifdef POOL_EVAL
-        WireE diff[32],dst[32],choice;
-        choice=c.pool.wE;
-        int i;
-        for(i=0;i<32;i++)
-            diff[i]=XorGate(tsrc[i].pool.wE,fsrc[i].pool.wE);
-        #endif
-        PoolMux(diff,choice,dst,&OramMCpool);
-        
+            WireE diff[32],dst[32],choice;
+            choice=c.pool.wE;
+            int i;
+            for(i=0;i<32;i++)
+                diff[i]=XorGate(tsrc[i].pool.wE,fsrc[i].pool.wE);
+            #endif
+            PoolMux(diff,choice,dst,&OramMCpool);
         #ifdef POOL_GARB
-        for(i=0;i<32;i++)
-            dest[i].pool.w=dst[i];
-            
+            for(i=0;i<32;i++)
+                dest[i].pool.w=dst[i];
         #endif
         #ifdef POOL_EVAL
-        for(i=0;i<32;i++)
-            dest[i].pool.wE=dst[i];
+            for(i=0;i<32;i++)
+                dest[i].pool.wE=dst[i];
+        #endif
+        #ifdef OBLIV_KNOWN
+            while(size-- > 0) {
+                __obliv_c__setBitXor(&x, tsrc, fsrc);
+                __obliv_c__setBitAnd(&a, &c, &x);
+                ++dest; 
+                ++fsrc; 
+                ++tsrc;
+            }
         #endif
         for(i=0;i<32;i++)
             __obliv_c__setBitXor(&(dest[i]), &(dest[i]), &(fsrc[i]));

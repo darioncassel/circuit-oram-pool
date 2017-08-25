@@ -11,22 +11,44 @@
     #include "../Pool/ZH128/Eval/client.h"
 #endif
 
+// #define DATA_1024
+
 
 void testOramAccess()
 {
     CircuitSetup(2, 1, 3);
     PoolSetup();
-    OramMCPoolSetup(32);
 
-    int n = 1000000;
+    int n = 258;
     int size = 1;
-    __obliv_c__int *content = calloc_mset(n, sizeof(__obliv_c__int));
+    
+    #ifdef DATA_1024
+        typedef struct {
+            __obliv_c__int data[32];
+        } data_1024;
+        data_1024 *content = calloc_mset(n, sizeof(data_1024));
+        OramMCPoolSetup(1024);
+    #else
+        __obliv_c__int *content = calloc_mset(n, sizeof(__obliv_c__int));
+        OramMCPoolSetup(32);
+    #endif
+
     __obliv_c__int *indices = calloc_mset(size, sizeof(__obliv_c__int));
-  
+
+    
     // Seed content
     for (int i = 0; i < n; i++) {
-        __obliv_c__int tmp0 = __obliv_c__newInt();
-        __obliv_c__genOblivInt(tmp0, i);
+        #ifdef DATA_1024
+            data_1024 tmp0;
+            for (int j = 0; j < 32; j++) {
+                __obliv_c__int tmp1 = __obliv_c__newInt();
+                __obliv_c__genOblivInt(tmp1, j);
+                tmp0.data[j] = tmp1;
+            }
+        #else
+            __obliv_c__int tmp0 = __obliv_c__newInt();
+            __obliv_c__genOblivInt(tmp0, i);
+        #endif
         content[i] = tmp0;
     }
 
@@ -50,14 +72,31 @@ void testOramAccess()
         ocOramWrite(cond, ram, tmp2, content + i);
     }*/
 
+    #ifdef DATA_1024
+        data_1024 output;
+    #else
+        __obliv_c__int output = __obliv_c__newInt();
+    #endif
+
+    // Commented out for metrics gathering
+    // int *outputs = _mm_malloc(size * sizeof(int), 32);
+
+    unsigned long long t0, t1 = 0; t0 = t1;
+    unsigned long long b0, b1 = 0; b0 = b1;
+    b0 = inByte + outByte;
+    // t0 = WallClock();
+
     // Read from ram
-    __obliv_c__int output = __obliv_c__newInt();
-    int *outputs = _mm_malloc(size * sizeof(int), 32);
     for (int i = 0; i < size; ++i) { 
         ocOramRead(cond, &output, ram, indices[i]);
         // Commented out for metrics gathering:
         // __obliv_c__revOblivInt(outputs + i, output);
     }
+
+    // t1 = WallClock();
+    b1 = inByte + outByte;
+    printf("time = %lf\n", (t1 - t0) * 1.0 / 1000000);
+    printf("B/W = %lf\n", (b1 - b0) * 1.0 / 1000000);
 
     #ifdef POOL_GARB
         printf("PoolAnd count: %d\n", AndGateCount);
