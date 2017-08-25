@@ -10,7 +10,7 @@ Path=Pool/ZH128
 CommonPath=$(Path)/Common
 GarbPath=$(Path)/Garb
 EvalPath=$(Path)/Eval
-CFLAGS= -w -I $(CommonPath) -march=native `libgcrypt-config --cflags --libs`  -lm -O3 -D DEBUG_METRICS_ON -D MAC -D Set1
+CFLAGS= -w -I $(CommonPath) -march=native `libgcrypt-config --cflags --libs`  -lm -O3 -D DEBUG_METRICS_ON -D MAC -D Set1 -D DATA_1024
 CFLAGG=$(CFLAGS) -I $(GarbPath) -D POOL_GARB
 CFLAGE=$(CFLAGS) -I $(EvalPath) -D POOL_EVAL
 

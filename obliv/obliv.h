@@ -3,6 +3,7 @@
 #include "obliv_bit.h"
 #include "obliv_gates.h"
 
+extern MCPoolPointer OramMCpool;
 
 typedef struct {
 	OblivBit* bits;

@@ -11,8 +11,6 @@
     #include "../Pool/ZH128/Eval/client.h"
 #endif
 
-#define DATA_1024
-
 
 void testOramAccess()
 {
@@ -82,7 +80,7 @@ void testOramAccess()
         __obliv_c__int output = __obliv_c__newInt();
     #endif
 
-    // Commented out for metrics gathering
+    // Commented out for metrics gathering:
     // int *outputs = _mm_malloc(size * sizeof(int), 32);
 
     unsigned long long t0, t1 = 0; t0 = t1;

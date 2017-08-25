@@ -546,7 +546,42 @@ void __obliv_c__intLShift(__obliv_c__int dest, __obliv_c__int src, int shift)
     __obliv_c__setLShift(dest.bits, src.bits, 32, shift);
 }
 
-extern MCPoolPointer OramMCpool;
+void __pool__mux(OblivBit c, OblivBit *dest, OblivBit *tsrc, 
+                 OblivBit *fsrc, int wire_size)
+{
+    int i;
+    #ifdef POOL_GARB
+        Wire diff[wire_size], dst[wire_size], choice;
+        choice = c.pool.w;
+        for(i = 0; i < wire_size; i++)
+            diff[i] = XorGate(tsrc[i].pool.w, fsrc[i].pool.w);
+    #endif
+    #ifdef POOL_EVAL
+        WireE diff[wire_size], dst[wire_size], choice;
+        choice = c.pool.wE;
+        for(i = 0; i < wire_size; i++)
+            diff[i] = XorGate(tsrc[i].pool.wE, fsrc[i].pool.wE);
+        #endif
+        PoolMux(diff, choice, dst, &OramMCpool);
+    #ifdef POOL_GARB
+        for(i = 0; i < wire_size; i++)
+            dest[i].pool.w = dst[i];
+    #endif
+    #ifdef POOL_EVAL
+        for(i = 0; i < wire_size; i++)
+            dest[i].pool.wE = dst[i];
+    #endif
+    #ifdef OBLIV_KNOWN
+        while(size-- > 0) {
+            __obliv_c__setBitXor(&x, tsrc, fsrc);
+            __obliv_c__setBitAnd(&a, &c, &x);
+            ++dest; 
+            ++fsrc; 
+            ++tsrc;
+        }
+    #endif
+}
+
 void __obliv_c__ifThenElse(void* vdest, const void* vtsrc
                            , const void* vfsrc, __obliv_c__size_t size
                            , const void* vcond)
@@ -554,40 +589,15 @@ void __obliv_c__ifThenElse(void* vdest, const void* vtsrc
     OblivBit x,a,c = *(const OblivBit*)vcond;
     OblivBit *dest=vdest;
     const OblivBit *tsrc = vtsrc, *fsrc = vfsrc;
-    if (size == 32) {
-        #ifdef POOL_GARB
-            Wire diff[32],dst[32],choice;
-            choice=c.pool.w;
-            int i;
-            for(i=0;i<32;i++)
-                diff[i]=XorGate(tsrc[i].pool.w,fsrc[i].pool.w);
-        #endif
-        #ifdef POOL_EVAL
-            WireE diff[32],dst[32],choice;
-            choice=c.pool.wE;
-            int i;
-            for(i=0;i<32;i++)
-                diff[i]=XorGate(tsrc[i].pool.wE,fsrc[i].pool.wE);
-            #endif
-            PoolMux(diff,choice,dst,&OramMCpool);
-        #ifdef POOL_GARB
-            for(i=0;i<32;i++)
-                dest[i].pool.w=dst[i];
-        #endif
-        #ifdef POOL_EVAL
-            for(i=0;i<32;i++)
-                dest[i].pool.wE=dst[i];
-        #endif
-        #ifdef OBLIV_KNOWN
-            while(size-- > 0) {
-                __obliv_c__setBitXor(&x, tsrc, fsrc);
-                __obliv_c__setBitAnd(&a, &c, &x);
-                ++dest; 
-                ++fsrc; 
-                ++tsrc;
-            }
-        #endif
-        for(i=0;i<32;i++)
+
+    int wire_size = 32;
+    #ifdef DATA_1024
+        wire_size = 1024;
+    #endif
+
+    if (size == wire_size) {
+        __pool__mux(c, dest, tsrc, fsrc, wire_size);
+        for(int i = 0; i < wire_size; i++)
             __obliv_c__setBitXor(&(dest[i]), &(dest[i]), &(fsrc[i]));
     } else {
         while(size-- > 0) {
