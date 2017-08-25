@@ -11,7 +11,7 @@
     #include "../Pool/ZH128/Eval/client.h"
 #endif
 
-// #define DATA_1024
+#define DATA_1024
 
 
 void testOramAccess()
@@ -35,7 +35,6 @@ void testOramAccess()
 
     __obliv_c__int *indices = calloc_mset(size, sizeof(__obliv_c__int));
 
-    
     // Seed content
     for (int i = 0; i < n; i++) {
         #ifdef DATA_1024
@@ -74,6 +73,11 @@ void testOramAccess()
 
     #ifdef DATA_1024
         data_1024 output;
+        for (int j = 0; j < 32; j++) {
+            __obliv_c__int tmp1 = __obliv_c__newInt();
+            __obliv_c__genOblivInt(tmp1, j);
+            output.data[j] = tmp1;
+        }
     #else
         __obliv_c__int output = __obliv_c__newInt();
     #endif
@@ -84,7 +88,9 @@ void testOramAccess()
     unsigned long long t0, t1 = 0; t0 = t1;
     unsigned long long b0, b1 = 0; b0 = b1;
     b0 = inByte + outByte;
-    // t0 = WallClock();
+    #ifndef MAC
+        t0 = WallClock();
+    #endif
 
     // Read from ram
     for (int i = 0; i < size; ++i) { 
@@ -93,7 +99,9 @@ void testOramAccess()
         // __obliv_c__revOblivInt(outputs + i, output);
     }
 
-    // t1 = WallClock();
+    #ifndef MAC
+        t1 = WallClock();
+    #endif
     b1 = inByte + outByte;
     printf("time = %lf\n", (t1 - t0) * 1.0 / 1000000);
     printf("B/W = %lf\n", (b1 - b0) * 1.0 / 1000000);
