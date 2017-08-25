@@ -591,7 +591,7 @@ void __obliv_c__ifThenElse(void* vdest, const void* vtsrc
     const OblivBit *tsrc = vtsrc, *fsrc = vfsrc;
 
     int wire_size = 32;
-    #ifdef DATA_1024
+    #ifdef Set2
         wire_size = 1024;
     #endif
 
