@@ -11,7 +11,7 @@ CommonPath=$(Path)/Common
 GarbPath=$(Path)/Garb
 EvalPath=$(Path)/Eval
 CFLAGS= -w -I $(CommonPath) -march=native `libgcrypt-config --cflags --libs` \
-	    -lm -O3 -D DEBUG_METRICS_ON -D MAC -D Set1 -D RECURSION_SCALE=8 -D RAM_SIZE=100
+	    -lm -O3 -D DEBUG_METRICS_ON -D MAC -D Set1 -D DATA_1024 -D RECURSION_SCALE=8 -D RAM_SIZE=100
 CFLAGG=$(CFLAGS) -I $(GarbPath) -D POOL_GARB
 CFLAGE=$(CFLAGS) -I $(EvalPath) -D POOL_EVAL
 

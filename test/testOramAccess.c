@@ -20,7 +20,7 @@ void testOramAccess()
     int n = RAM_SIZE;
     int size = 1;
     
-    #ifdef Set2
+    #ifdef DATA_1024
         typedef struct {
             __obliv_c__int data[32];
         } data_1024;
@@ -35,7 +35,7 @@ void testOramAccess()
 
     // Seed content
     for (int i = 0; i < n; i++) {
-        #ifdef Set2
+        #ifdef DATA_1024
             data_1024 tmp0;
             for (int j = 0; j < 32; j++) {
                 __obliv_c__int tmp1 = __obliv_c__newInt();
@@ -70,7 +70,7 @@ void testOramAccess()
         ocOramWrite(cond, ram, tmp2, content + i);
     }*/
 
-    #ifdef Set2
+    #ifdef DATA_1024
         data_1024 output;
         for (int j = 0; j < 32; j++) {
             __obliv_c__int tmp1 = __obliv_c__newInt();

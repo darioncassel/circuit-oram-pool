@@ -580,6 +580,9 @@ void __pool__mux(OblivBit c, OblivBit *dest, OblivBit *tsrc,
             ++tsrc;
         }
     #endif
+    #ifdef DEBUG_METRICS_ON
+        __debug__AND_count += wire_size;
+    #endif
 }
 
 void __obliv_c__ifThenElse(void* vdest, const void* vtsrc
@@ -591,7 +594,7 @@ void __obliv_c__ifThenElse(void* vdest, const void* vtsrc
     const OblivBit *tsrc = vtsrc, *fsrc = vfsrc;
 
     int wire_size = 32;
-    #ifdef Set2
+    #ifdef DATA_1024
         wire_size = 1024;
     #endif
 
