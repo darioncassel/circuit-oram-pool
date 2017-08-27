@@ -3,11 +3,16 @@
 #include <string.h>
 #include "obliv.h"
 
+#ifdef DATA_1024
+    #define OBLIV_INT_SIZE 1024
+#else
+    #define OBLIV_INT_SIZE 32
+#endif
 
 __obliv_c__int __obliv_c__newInt(void)
 {
 	__obliv_c__int newInt;
-	newInt.bits = _mm_malloc(sizeof(OblivBit) * 32, 32);
+	newInt.bits = _mm_malloc(sizeof(OblivBit) * OBLIV_INT_SIZE, 32);
     if (newInt.bits == NULL) {
         exit(EXIT_FAILURE);
     }
@@ -279,7 +284,7 @@ void __obliv_c__uIntBitwiseAnd(__obliv_c__uInt dest, __obliv_c__uInt op1,
 void __obliv_c__intBitwiseAnd(__obliv_c__int dest, __obliv_c__int op1, 
                               __obliv_c__int op2) 
 {
-    __obliv_c__setBitwiseAnd(dest.bits, op1.bits, op2.bits, 32);
+    __obliv_c__setBitwiseAnd(dest.bits, op1.bits, op2.bits, OBLIV_INT_SIZE);
 }
 
 void __obliv_c__boolAnd(__obliv_c__bool dest, __obliv_c__bool op1,
@@ -471,7 +476,7 @@ void __obliv_c__setBitsSub(void* vdest, void* borrowOut, const void* vop1,
 
 void __obliv_c__intSub(__obliv_c__int dest, __obliv_c__int op1, __obliv_c__int op2) 
 {
-	__obliv_c__setBitsAdd(dest.bits, NULL, op1.bits, op2.bits, NULL, 32);
+	__obliv_c__setBitsAdd(dest.bits, NULL, op1.bits, op2.bits, NULL, OBLIV_INT_SIZE);
 }
 
 void __obliv_c__setSignExtend(void* vdest, __obliv_c__size_t dsize,
@@ -524,7 +529,7 @@ void __obliv_c__uIntRShift(__obliv_c__uInt dest, __obliv_c__uInt src, unsigned i
 
 void __obliv_c__intRShift(__obliv_c__int dest, __obliv_c__int src, int shift) 
 {
-    __obliv_c__setRShift(dest.bits, src.bits, 32, shift, false);
+    __obliv_c__setRShift(dest.bits, src.bits, OBLIV_INT_SIZE, shift, false);
 }
 
 void __obliv_c__setLShift(void* vdest, const void* vsrc, __obliv_c__size_t n,
@@ -543,7 +548,7 @@ void __obliv_c__setLShift(void* vdest, const void* vsrc, __obliv_c__size_t n,
 
 void __obliv_c__intLShift(__obliv_c__int dest, __obliv_c__int src, int shift) 
 {
-    __obliv_c__setLShift(dest.bits, src.bits, 32, shift);
+    __obliv_c__setLShift(dest.bits, src.bits, OBLIV_INT_SIZE, shift);
 }
 
 void __pool__mux(OblivBit c, OblivBit *dest, OblivBit *tsrc, 
@@ -650,7 +655,7 @@ void __obliv_c__intCondAssign(__obliv_c__bool cond, __obliv_c__int dest, __obliv
         src = __obliv_c__newInt();
         __obliv_c__genOblivInt(src, 0);
     }
-    __obliv_c__condAssign(cond.bits, dest.bits, src.bits, 32);
+    __obliv_c__condAssign(cond.bits, dest.bits, src.bits, OBLIV_INT_SIZE);
 }
 
 void *calloc_mset(size_t __count, size_t __size) {

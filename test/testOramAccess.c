@@ -12,40 +12,28 @@
 #endif
 
 
-void testOramAccess()
+void testOramAccess(int ram_size)
 {
+    // Setup Pool
     CircuitSetup(2, 1, 3);
     PoolSetup();
 
-    int n = RAM_SIZE;
-    int size = 1;
-    
-    #ifdef DATA_1024
-        typedef struct {
-            __obliv_c__int data[32];
-        } data_1024;
-        data_1024 *content = calloc_mset(n, sizeof(data_1024));
+    #ifdef DATA_1024 
         OramMCPoolSetup(1024);
     #else
-        __obliv_c__int *content = calloc_mset(n, sizeof(__obliv_c__int));
         OramMCPoolSetup(32);
     #endif
 
+    int n = ram_size;
+    int size = 1;
+
+    __obliv_c__int *content = calloc_mset(n, sizeof(__obliv_c__int));
     __obliv_c__int *indices = calloc_mset(size, sizeof(__obliv_c__int));
 
     // Seed content
     for (int i = 0; i < n; i++) {
-        #ifdef DATA_1024
-            data_1024 tmp0;
-            for (int j = 0; j < 32; j++) {
-                __obliv_c__int tmp1 = __obliv_c__newInt();
-                __obliv_c__genOblivInt(tmp1, j);
-                tmp0.data[j] = tmp1;
-            }
-        #else
-            __obliv_c__int tmp0 = __obliv_c__newInt();
-            __obliv_c__genOblivInt(tmp0, i);
-        #endif
+        __obliv_c__int tmp0 = __obliv_c__newInt();
+        __obliv_c__genOblivInt(tmp0, i);
         content[i] = tmp0;
     }
 
@@ -62,28 +50,9 @@ void testOramAccess()
     __obliv_c__bool cond = __obliv_c__newBool();
     __obliv_c__genOblivBool(cond, true);
 
-    // Commented out for metrics gathering:
-    /* Write to ram
-    for (int i = 0; i < n; ++i) {
-        __obliv_c__int tmp2 = __obliv_c__newInt();
-        __obliv_c__genOblivInt(tmp2, i);
-        ocOramWrite(cond, ram, tmp2, content + i);
-    }*/
+    __obliv_c__int output = __obliv_c__newInt();
 
-    #ifdef DATA_1024
-        data_1024 output;
-        for (int j = 0; j < 32; j++) {
-            __obliv_c__int tmp1 = __obliv_c__newInt();
-            __obliv_c__genOblivInt(tmp1, j);
-            output.data[j] = tmp1;
-        }
-    #else
-        __obliv_c__int output = __obliv_c__newInt();
-    #endif
-
-    // Commented out for metrics gathering:
-    // int *outputs = _mm_malloc(size * sizeof(int), 32);
-
+    // Benchmark begin
     unsigned long long t0, t1 = 0; t0 = t1;
     unsigned long long b0, b1 = 0; b0 = b1;
     b0 = inByte + outByte;
@@ -94,20 +63,15 @@ void testOramAccess()
     // Read from ram
     for (int i = 0; i < size; ++i) { 
         ocOramRead(cond, &output, ram, indices[i]);
-        // Commented out for metrics gathering:
-        // __obliv_c__revOblivInt(outputs + i, output);
     }
 
+    // Benchmark end
     #ifndef MAC
         t1 = wallClock();
     #endif
     b1 = inByte + outByte;
     printf("time = %lf\n", (t1 - t0) * 1.0 / 1000000);
     printf("B/W = %lf\n", (b1 - b0) * 1.0 / 1000000);
-
-    #ifdef POOL_GARB
-        printf("PoolAnd count: %d\n", AndGateCount);
-    #endif
 
     ocOramRelease(ram);
     _mm_free(indices);
@@ -116,11 +80,18 @@ void testOramAccess()
 
 int main(int argc, char ** argv) 
 {
-    int c;
-    c = atoi(argv[1]);
+    if (argc != 3) {
+        printf("Error: Invalid arguments specified!\n");
+        printf("Args: 1 - Connection port\n");
+        printf("      2 - ORAM size\n");
+        printf("Ex: ./pool_garb 1234 100\n");
+        exit(EXIT_FAILURE);
+    }
+    int c = atoi(argv[1]);
+    int n = atoi(argv[2]);
     opensocket(c);
     printf("Beginning test...\n");
-    testOramAccess();
+    testOramAccess(n);
     printf("%lld\n", __debug__AND_count);
     printf("%lld\n", __debug__XOR_count);
     printf("Test complete.\n");
